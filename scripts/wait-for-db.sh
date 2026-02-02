@@ -15,6 +15,8 @@ RETRY_INTERVAL="${DB_RETRY_INTERVAL:-2}"
 if [ -n "$DB_URI" ]; then
     # Extract host, port, and user from DB_URI for pg_isready
     # Format: postgresql://user:password@host:port/database or postgresql://user:password@host/database
+    # Note: The full DB_URI (with password and special characters) is used directly by Python/psycopg2
+    # The extracted values are only used by pg_isready, which doesn't need the password
     if [[ $DB_URI =~ postgresql://([^:]+):[^@]+@([^:]+):([0-9]+)/ ]]; then
         USER="${BASH_REMATCH[1]}"
         HOST="${BASH_REMATCH[2]}"
@@ -26,18 +28,21 @@ if [ -n "$DB_URI" ]; then
     fi
     
     # Validate extracted values to prevent issues with malformed input
+    # These validations only apply to pg_isready usage; Python fallback uses full DB_URI
     if ! [[ "$PORT" =~ ^[0-9]+$ ]] || [ "$PORT" -lt 1 ] || [ "$PORT" -gt 65535 ]; then
         echo "[WARN] Invalid port extracted from DB_URI: $PORT, using default 5432"
         PORT="5432"
     fi
     
-    # Sanitize HOST to allow only valid hostname characters
+    # Sanitize HOST to allow only valid hostname characters (alphanumeric, dots, underscores, hyphens)
     if ! [[ "$HOST" =~ ^[a-zA-Z0-9._-]+$ ]]; then
         echo "[ERROR] Invalid host extracted from DB_URI: $HOST"
         exit 1
     fi
     
-    # Sanitize USER to allow only valid username characters
+    # Sanitize USER to allow standard username characters
+    # Note: PostgreSQL supports more complex usernames (with $, spaces, etc.), but those should use
+    # environment variables (DB_USER) directly or rely on the Python fallback which uses full DB_URI
     if ! [[ "$USER" =~ ^[a-zA-Z0-9._-]+$ ]]; then
         echo "[ERROR] Invalid user extracted from DB_URI: $USER"
         exit 1
