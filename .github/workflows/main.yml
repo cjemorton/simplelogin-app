@@ -8,10 +8,9 @@ on:
     branches:
       - master
     tags:
-      - v*
-    tags-ignore:
-      - '*-test*'
-      - '*-rc*'
+      - 'v*'
+      - '!*-test*'
+      - '!*-rc*'
   pull_request:
 
 env:
