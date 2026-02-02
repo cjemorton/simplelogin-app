@@ -81,7 +81,7 @@ def init_sentry(
     # Rule 4: Neither SKIP_SENTRY nor SENTRY_DSN are set
     if not skip_sentry and not sentry_dsn:
         if require_sentry:
-            LOG.error(
+            LOG.critical(
                 "CRITICAL: Sentry cannot be initialized. "
                 "Either set SENTRY_DSN to enable Sentry, or set SKIP_SENTRY=1 to skip initialization. "
                 "Stopping the build immediately to prevent wasted build time."
