@@ -54,6 +54,7 @@ from app.config import (
     MAX_NB_EMAIL_FREE_PLAN,
     MEM_STORE_URI,
     SENTRY_TRACE_RATE,
+    SKIP_SENTRY,
 )
 from app.dashboard.base import dashboard_bp
 from app.db import Session
@@ -83,7 +84,9 @@ from app.redis_services import initialize_redis_services
 from app.request_utils import generate_request_id
 from app.sentry_utils import sentry_before_send
 
-if SENTRY_DSN:
+if SKIP_SENTRY:
+    LOG.i("Sentry tracking is disabled (SKIP_SENTRY is set). To enable Sentry, set SENTRY_DSN from your Sentry dashboard and unset SKIP_SENTRY.")
+elif SENTRY_DSN:
     LOG.d("enable sentry")
     sentry_sdk.init(
         dsn=SENTRY_DSN,
@@ -95,6 +98,8 @@ if SENTRY_DSN:
         before_send=sentry_before_send,
         traces_sample_rate=SENTRY_TRACE_RATE,
     )
+else:
+    LOG.i("Sentry tracking is not configured. To enable: (1) Create a Sentry project at https://sentry.io, (2) Set SENTRY_DSN environment variable with your DSN from the Sentry dashboard. To explicitly skip this message, set SKIP_SENTRY=1 in your environment.")
 
 # the app is served behind nginx which uses http and not https
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
@@ -197,7 +202,8 @@ def create_app() -> Flask:
 def load_user(alternative_id):
     user = User.get_by(alternative_id=alternative_id)
     if user:
-        sentry_sdk.set_user({"email": user.email, "id": user.id})
+        if SENTRY_DSN and not SKIP_SENTRY:
+            sentry_sdk.set_user({"email": user.email, "id": user.id})
         if user.disabled:
             return None
         if not user.is_active():
@@ -397,6 +403,7 @@ def jinja2_filter(app):
             NOW=now,
             URL=URL,
             SENTRY_DSN=SENTRY_FRONT_END_DSN,
+            SKIP_SENTRY=SKIP_SENTRY,
             VERSION=SHA1,
             FIRST_ALIAS_DOMAIN=FIRST_ALIAS_DOMAIN,
             PLAUSIBLE_HOST=PLAUSIBLE_HOST,
