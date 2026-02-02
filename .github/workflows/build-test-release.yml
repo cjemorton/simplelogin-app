@@ -141,10 +141,10 @@ jobs:
           if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
             # Manual trigger - use branch name and input suffix
             BRANCH_NAME=$(echo ${{ github.ref_name }} | sed 's/[^a-zA-Z0-9._-]/-/g')
-            TAG="simplelogin/app-ci:${BRANCH_NAME}-${{ inputs.tag_suffix }}"
+            TAG="${{ secrets.DOCKER_USERNAME }}/simplelogin-app:${BRANCH_NAME}-${{ inputs.tag_suffix }}"
           else
             # Tag trigger - use the tag name
-            TAG="simplelogin/app-ci:${{ github.ref_name }}"
+            TAG="${{ secrets.DOCKER_USERNAME }}/simplelogin-app:${{ github.ref_name }}"
           fi
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
           echo "Docker image will be tagged as: ${TAG}"
