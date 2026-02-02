@@ -72,8 +72,8 @@ def init_sentry(
         # Skip Sentry initialization silently
         return
 
-    # Rule 3: Only SENTRY_DSN is set
-    if sentry_dsn and not skip_sentry:
+    # Rule 3: SENTRY_DSN is set (skip_sentry must be False here due to Rules 1-2)
+    if sentry_dsn:
         LOG.info("Enabling Sentry")
         _initialize_sentry_sdk(sentry_dsn, sha1, trace_rate)
         return
