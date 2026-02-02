@@ -1,11 +1,16 @@
 name: SimpleLogin actions
 
+# This workflow runs on production releases (v* tags, excluding test/rc tags)
+# For test/rc builds, see build-test-release.yml
+
 on:
   push:
     branches:
       - master
     tags:
       - v*
+      - '!*-test*'
+      - '!*-rc*'
   pull_request:
 
 env:
