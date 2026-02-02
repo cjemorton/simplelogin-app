@@ -78,18 +78,15 @@ def init_sentry(
         _initialize_sentry_sdk(sentry_dsn, sha1, trace_rate)
         return
 
-    # Rule 4: Neither SKIP_SENTRY nor SENTRY_DSN are set (catch-all for remaining cases)
-    if not skip_sentry and not sentry_dsn:
-        if require_sentry:
-            LOG.critical(
-                "CRITICAL: Sentry cannot be initialized. "
-                "Either set SENTRY_DSN to enable Sentry, or set SKIP_SENTRY=1 to skip initialization. "
-                "Stopping the build immediately to prevent wasted build time."
-            )
-            sys.exit(1)
-        else:
-            # For development/test environments, skip silently
-            return
+    # Rule 4: Neither SKIP_SENTRY nor SENTRY_DSN are set
+    if require_sentry:
+        LOG.critical(
+            "CRITICAL: Sentry cannot be initialized. "
+            "Either set SENTRY_DSN to enable Sentry, or set SKIP_SENTRY=1 to skip initialization. "
+            "Stopping the build immediately to prevent wasted build time."
+        )
+        sys.exit(1)
+    # For development/test environments, skip silently
 
 
 def _initialize_sentry_sdk(sentry_dsn: str, sha1: str, trace_rate: float) -> None:
