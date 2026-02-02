@@ -1,0 +1,180 @@
+name: Build Test Release
+
+# This workflow allows building Docker images from any branch for testing purposes
+# Trigger it manually via GitHub Actions UI or by creating a tag with "-test" suffix
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag_suffix:
+        description: 'Docker tag suffix (e.g., test-pg-isready)'
+        required: true
+        default: 'test'
+        type: string
+  push:
+    tags:
+      - '*-test*'
+      - '*-rc*'
+
+env:
+  CMAKE_POLICY_VERSION_MINIMUM: 3.5
+  UV_VERSION: 0.8.18
+
+# Set minimal permissions for all jobs
+permissions:
+  contents: read
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+
+      - name: Install OS dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y libre2-dev libpq-dev
+
+      - name: Install dependencies
+        if: steps.setup-uv.outputs.cache-hit != 'true'
+        run: uv sync --locked --all-extras
+
+      - name: Check formatting & linting
+        run: |
+          uv run pre-commit run --all-files
+
+  test:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    services:
+      postgres:
+        image: postgres:13
+        env:
+          POSTGRES_DB: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_PORT: 5432
+          POSTGRES_USER: test
+        ports:
+          - 15432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v3
+
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
+        with:
+          version: ${{ env.UV_VERSION }}
+          enable-cache: true
+
+      - name: Install OS dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y libre2-dev libpq-dev
+
+      - name: Install dependencies
+        if: steps.setup-uv.outputs.cache-hit != 'true'
+        run: uv sync --locked --all-extras
+
+      - name: Start Redis v6
+        uses: superchargejs/redis-github-action@1.1.0
+        with:
+          redis-version: 6
+
+      - name: Run db migration
+        run: |
+          CONFIG=tests/test.env uv run alembic upgrade head
+
+      - name: Prepare version file
+        run: |
+          scripts/generate-build-info.sh ${{ github.sha }} ${{ github.ref_name }}
+          cat app/build_info.py
+
+      - name: Test with pytest
+        run: |
+          uv run pytest
+        env:
+          GITHUB_ACTIONS_TEST: true
+
+  build:
+    runs-on: ubuntu-latest
+    needs: ['test', 'lint']
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PAT_TOKEN }}
+
+      - name: Determine Docker tag
+        id: docker_tag
+        run: |
+          if [ "${{ github.event_name }}" == "workflow_dispatch" ]; then
+            # Manual trigger - use branch name and input suffix
+            BRANCH_NAME=$(echo ${{ github.ref_name }} | sed 's/[^a-zA-Z0-9._-]/-/g')
+            TAG="simplelogin/app-ci:${BRANCH_NAME}-${{ inputs.tag_suffix }}"
+          else
+            # Tag trigger - use the tag name
+            TAG="simplelogin/app-ci:${{ github.ref_name }}"
+          fi
+          echo "tag=${TAG}" >> $GITHUB_OUTPUT
+          echo "Docker image will be tagged as: ${TAG}"
+
+      - name: Prepare version file
+        run: |
+          scripts/generate-build-info.sh ${{ github.sha }} ${{ github.ref_name }}
+          cat app/build_info.py
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: ${{ steps.docker_tag.outputs.tag }}
+
+      - name: Summary
+        run: |
+          echo "## Build Successful! 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Docker image has been built and pushed:" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.docker_tag.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "To use this image, update your deployment to use:" >> $GITHUB_STEP_SUMMARY
+          echo '```bash' >> $GITHUB_STEP_SUMMARY
+          echo "docker pull ${{ steps.docker_tag.outputs.tag }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "Branch: \`${{ github.ref_name }}\`" >> $GITHUB_STEP_SUMMARY
+          echo "Commit: \`${{ github.sha }}\`" >> $GITHUB_STEP_SUMMARY
