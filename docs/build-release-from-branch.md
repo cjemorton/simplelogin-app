@@ -4,7 +4,7 @@ This document explains how to create a release build from the `fix-pg_isready` b
 
 ## Current Situation
 
-The `fix-pg_isready` branch contains changes that add database readiness checks with `pg_isready` and psycopg2 fallback. The changes are already merged in commit `bf2f57a`.
+The `fix-pg_isready` branch contains changes that add database readiness checks with `pg_isready` and psycopg2 fallback. This is a separate branch created for testing these improvements before merging to master.
 
 The current GitHub Actions workflow (`.github/workflows/main.yml`) automatically builds and publishes Docker images **only** when:
 - Pushing to the `master` branch, OR
