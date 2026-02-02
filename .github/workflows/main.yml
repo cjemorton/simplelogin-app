@@ -11,6 +11,9 @@ on:
 env:
   CMAKE_POLICY_VERSION_MINIMUM: 3.5
   UV_VERSION: 0.8.18
+  # Skip Sentry initialization in CI/CD to prevent build failures
+  # Remove this or set to empty string if you want to enable Sentry in CI
+  SKIP_SENTRY: 1
 
 jobs:
   lint:

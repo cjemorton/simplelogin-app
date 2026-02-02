@@ -416,8 +416,13 @@ GNUPGHOME=/sl/pgp
 LOCAL_FILE_UPLOAD=1
 
 POSTFIX_SERVER=10.0.0.1
+
+# Optional: Skip Sentry error tracking (useful for self-hosted instances)
+# Remove this line or set to empty if you want to enable Sentry monitoring
+SKIP_SENTRY=1
 ```
 
+**Note on Sentry:** Sentry is an optional error tracking service. If you don't need error monitoring, set `SKIP_SENTRY=1` in your config (as shown above). If you want to enable Sentry, get a DSN from https://sentry.io and set `SENTRY_DSN` in your config instead. More details in [example.env](example.env).
 
 Before running the webapp, you need to prepare the database by running the migration.
 
