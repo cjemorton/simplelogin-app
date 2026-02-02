@@ -1,6 +1,6 @@
 # Quick Start: Building a Release from fix-pg_isready Branch
 
-This is a quick reference guide. For detailed information, see [build-release-from-branch.md](./build-release-from-branch.md).
+This is a quick reference guide. For detailed information, see [docs/build-release-from-branch.md](docs/build-release-from-branch.md).
 
 ## Fastest Method: Create a Test Tag
 
@@ -60,4 +60,4 @@ git push --delete origin v4.0.0-test-pg-isready
 
 ## Need Help?
 
-See the full documentation: [build-release-from-branch.md](./build-release-from-branch.md)
+See the full documentation: [docs/build-release-from-branch.md](docs/build-release-from-branch.md)
