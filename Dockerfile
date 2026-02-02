@@ -7,7 +7,7 @@ RUN cd /code/static && npm ci
 FROM --platform=linux/amd64 ubuntu:22.04
 
 # Ensure pg_isready is present for reliable DB health checks
-RUN apt-get update && apt-get install -y postgresql-client && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y --no-install-recommends postgresql-client && rm -rf /var/lib/apt/lists/*
 
 ARG UV_VERSION="0.7.13"
 ARG UV_HASH="909278eb197c5ed0e9b5f16317d1255270d1f9ea4196e7179ce934d48c4c2545"
