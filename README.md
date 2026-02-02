@@ -577,6 +577,7 @@ Below are pointers to different topics:
 - [Upgrade existing SimpleLogin installation](docs/upgrade.md)
 - [Enforce SPF](docs/enforce-spf.md)
 - [Postfix TLS](docs/postfix-tls.md)
+- [Building releases from branches](docs/build-release-from-branch.md)
 
 ## ❤️ Contributors
 
