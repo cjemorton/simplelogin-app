@@ -21,8 +21,6 @@ from flask import (
 )
 from flask_cors import cross_origin, CORS
 from flask_login import current_user
-from sentry_sdk.integrations.flask import FlaskIntegration
-from sentry_sdk.integrations.sqlalchemy import SqlalchemyIntegration
 from werkzeug.middleware.proxy_fix import ProxyFix
 
 from app import config, constants
@@ -34,6 +32,7 @@ from app.config import (
     DB_URI,
     FLASK_SECRET,
     SENTRY_DSN,
+    SKIP_SENTRY,
     URL,
     FLASK_PROFILER_PATH,
     FLASK_PROFILER_PASSWORD,
@@ -81,20 +80,25 @@ from app.payments.paddle import setup_paddle_callback
 from app.phone.base import phone_bp
 from app.redis_services import initialize_redis_services
 from app.request_utils import generate_request_id
-from app.sentry_utils import sentry_before_send
+from app.sentry_utils import init_sentry
 
-if SENTRY_DSN:
-    LOG.d("enable sentry")
-    sentry_sdk.init(
-        dsn=SENTRY_DSN,
-        release=f"app@{SHA1}",
-        integrations=[
-            FlaskIntegration(),
-            SqlalchemyIntegration(),
-        ],
-        before_send=sentry_before_send,
-        traces_sample_rate=SENTRY_TRACE_RATE,
-    )
+# Initialize Sentry with the centralized initialization logic.
+# The require_sentry parameter controls behavior when neither SENTRY_DSN nor SKIP_SENTRY are set:
+# - require_sentry=False (current): Skip initialization silently (suitable for development/test)
+# - require_sentry=True: Exit immediately with a critical error (recommended for production)
+#
+# This is currently set to False to allow flexible development and testing.
+# For production deployments where Sentry should always be configured:
+#   1. Set this to True, or
+#   2. Add an environment variable like REQUIRE_SENTRY and use:
+#      require_sentry=os.environ.get("REQUIRE_SENTRY", "0") == "1"
+init_sentry(
+    sentry_dsn=SENTRY_DSN,
+    skip_sentry=SKIP_SENTRY,
+    sha1=SHA1,
+    trace_rate=SENTRY_TRACE_RATE,
+    require_sentry=False,
+)
 
 # the app is served behind nginx which uses http and not https
 os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
