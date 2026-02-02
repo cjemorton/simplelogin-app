@@ -82,15 +82,20 @@ from app.redis_services import initialize_redis_services
 from app.request_utils import generate_request_id
 from app.sentry_utils import init_sentry
 
-# Initialize Sentry with the centralized initialization logic
-# For production builds, require_sentry=True will cause the app to exit if neither
-# SENTRY_DSN nor SKIP_SENTRY are set. For development, set require_sentry=False.
+# Initialize Sentry with the centralized initialization logic.
+# The require_sentry parameter controls behavior when neither SENTRY_DSN nor SKIP_SENTRY are set:
+# - require_sentry=False (current): Skip initialization silently (suitable for development/test)
+# - require_sentry=True: Exit immediately with an error (recommended for production builds)
+# 
+# Note: This is currently set to False to allow flexible development and testing.
+# For production deployments, consider using an environment variable to control this dynamically,
+# or change this to True to enforce proper Sentry configuration.
 init_sentry(
     sentry_dsn=SENTRY_DSN,
     skip_sentry=SKIP_SENTRY,
     sha1=SHA1,
     trace_rate=SENTRY_TRACE_RATE,
-    require_sentry=False,  # Set to True for production builds
+    require_sentry=False,
 )
 
 # the app is served behind nginx which uses http and not https
