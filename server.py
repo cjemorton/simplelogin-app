@@ -85,11 +85,13 @@ from app.sentry_utils import init_sentry
 # Initialize Sentry with the centralized initialization logic.
 # The require_sentry parameter controls behavior when neither SENTRY_DSN nor SKIP_SENTRY are set:
 # - require_sentry=False (current): Skip initialization silently (suitable for development/test)
-# - require_sentry=True: Exit immediately with an error (recommended for production builds)
+# - require_sentry=True: Exit immediately with a critical error (recommended for production)
 # 
-# Note: This is currently set to False to allow flexible development and testing.
-# For production deployments, consider using an environment variable to control this dynamically,
-# or change this to True to enforce proper Sentry configuration.
+# This is currently set to False to allow flexible development and testing.
+# For production deployments where Sentry should always be configured:
+#   1. Set this to True, or
+#   2. Add an environment variable like REQUIRE_SENTRY and use:
+#      require_sentry=os.environ.get("REQUIRE_SENTRY", "0") == "1"
 init_sentry(
     sentry_dsn=SENTRY_DSN,
     skip_sentry=SKIP_SENTRY,
