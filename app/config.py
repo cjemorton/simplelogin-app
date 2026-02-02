@@ -96,7 +96,9 @@ RP_ID = urlparse(URL).hostname
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
 SENTRY_TRACE_RATE = float(os.environ.get("SENTRY_TRACE_RATE", "0.001"))
 # Set to skip Sentry initialization even if SENTRY_DSN is not set
-SKIP_SENTRY = "SKIP_SENTRY" in os.environ
+# Treats "1", "true", "True", "yes" as true, anything else as false
+_skip_sentry_val = os.environ.get("SKIP_SENTRY", "").lower()
+SKIP_SENTRY = _skip_sentry_val in ("1", "true", "yes")
 
 # can use another sentry project for the front-end to avoid noises
 SENTRY_FRONT_END_DSN = os.environ.get("SENTRY_FRONT_END_DSN") or SENTRY_DSN
