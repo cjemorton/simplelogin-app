@@ -14,8 +14,8 @@ RETRY_INTERVAL="${DB_RETRY_INTERVAL:-2}"
 # Parse database connection string if DB_URI is set
 if [ -n "$DB_URI" ]; then
     # Extract host, port, and user from DB_URI for pg_isready
-    # Format: postgresql://user:password@host:port/database
-    if [[ $DB_URI =~ postgresql://([^:]+):[^@]+@([^:]+):([^/]+)/ ]]; then
+    # Format: postgresql://user:password@host:port/database or postgresql://user:password@host/database
+    if [[ $DB_URI =~ postgresql://([^:]+):[^@]+@([^:]+):([0-9]+)/ ]]; then
         USER="${BASH_REMATCH[1]}"
         HOST="${BASH_REMATCH[2]}"
         PORT="${BASH_REMATCH[3]}"
@@ -23,6 +23,24 @@ if [ -n "$DB_URI" ]; then
         USER="${BASH_REMATCH[1]}"
         HOST="${BASH_REMATCH[2]}"
         PORT="5432"
+    fi
+    
+    # Validate extracted values to prevent issues with malformed input
+    if ! [[ "$PORT" =~ ^[0-9]+$ ]] || [ "$PORT" -lt 1 ] || [ "$PORT" -gt 65535 ]; then
+        echo "[WARN] Invalid port extracted from DB_URI: $PORT, using default 5432"
+        PORT="5432"
+    fi
+    
+    # Sanitize HOST to allow only valid hostname characters
+    if ! [[ "$HOST" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+        echo "[ERROR] Invalid host extracted from DB_URI: $HOST"
+        exit 1
+    fi
+    
+    # Sanitize USER to allow only valid username characters
+    if ! [[ "$USER" =~ ^[a-zA-Z0-9._-]+$ ]]; then
+        echo "[ERROR] Invalid user extracted from DB_URI: $USER"
+        exit 1
     fi
 fi
 
@@ -51,6 +69,10 @@ try:
     # Try to use full DB_URI if available (includes password)
     db_uri = os.environ.get("_DB_URI", "")
     if db_uri:
+        # Basic validation of DB_URI format
+        if not db_uri.startswith("postgresql://"):
+            print("[ERROR] Invalid DB_URI format", file=sys.stderr)
+            sys.exit(1)
         conn = psycopg2.connect(db_uri, connect_timeout=5)
     else:
         # Fallback to individual parameters (no password)
