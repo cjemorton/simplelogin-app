@@ -1,6 +1,8 @@
 # Quick Start: Building a Release from fix-pg_isready Branch
 
-This is a quick reference guide. For detailed information, see [docs/build-release-from-branch.md](docs/build-release-from-branch.md).
+Need to build a Docker image from the `fix-pg_isready` branch for testing? This guide shows you the fastest way.
+
+For detailed information and alternative methods, see [docs/build-release-from-branch.md](docs/build-release-from-branch.md).
 
 ## Fastest Method: Create a Test Tag
 
