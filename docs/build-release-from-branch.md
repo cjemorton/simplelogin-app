@@ -82,10 +82,8 @@ If you don't want to use GitHub Actions or don't have access to the CI/CD secret
    ```bash
    # Tag for your registry
    docker tag simplelogin/app:test-pg-isready your-registry.com/simplelogin/app:test-pg-isready
-   
    # Login to your registry
    docker login your-registry.com
-   
    # Push
    docker push your-registry.com/simplelogin/app:test-pg-isready
    ```
