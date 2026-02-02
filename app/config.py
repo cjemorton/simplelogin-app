@@ -93,11 +93,7 @@ print(">>> URL:", URL)
 # Calculate RP_ID for WebAuthn
 RP_ID = urlparse(URL).hostname
 
-# Sentry configuration
-# SENTRY_DSN: If set, enables Sentry error tracking (takes precedence over SKIP_SENTRY)
-# SKIP_SENTRY: If set to "1", skips Sentry initialization (unless SENTRY_DSN is also set)
 SENTRY_DSN = os.environ.get("SENTRY_DSN")
-SKIP_SENTRY = os.environ.get("SKIP_SENTRY") == "1"
 SENTRY_TRACE_RATE = float(os.environ.get("SENTRY_TRACE_RATE", "0.001"))
 
 # can use another sentry project for the front-end to avoid noises
