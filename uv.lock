@@ -527,7 +527,7 @@ wheels = [
 [[package]]
 name = "flanker"
 version = "0.9.11"
-source = { registry = "https://pypi.org/simple" }
+source = { git = "https://github.com/mailgun/flanker.git?rev=v0.9.15#551813cfa4ca3fb29c63ec322d1aa10de138a044" }
 dependencies = [
     { name = "attrs" },
     { name = "chardet" },
@@ -539,7 +539,6 @@ dependencies = [
     { name = "tld" },
     { name = "webob" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/a6/44/a2d77a6f2ad4d78912b549a97b915f43da3cc9e6dbfc2084520bdaa6d00e/flanker-0.9.11.tar.gz", hash = "sha256:974418e5b498fd3bcb3859c22e22d26495257f9cf98b744c17f2335aca86e001", size = 105180, upload-time = "2019-12-05T16:08:20.17Z" }
 
 [[package]]
 name = "flask"
@@ -1857,7 +1856,7 @@ requires-dist = [
     { name = "dnspython", specifier = "~=2.7.0" },
     { name = "email-validator", specifier = "~=2.2.0" },
     { name = "facebook-sdk", specifier = "~=3.1.0" },
-    { name = "flanker", specifier = "~=0.9.11" },
+    { name = "flanker", git = "https://github.com/mailgun/flanker.git?rev=v0.9.15" },
     { name = "flask", specifier = "~=1.1.2" },
     { name = "flask-admin", specifier = "~=1.5.6" },
     { name = "flask-cors", specifier = "~=3.0.9" },
