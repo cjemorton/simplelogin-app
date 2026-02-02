@@ -13,15 +13,15 @@ RETRY_INTERVAL="${DB_RETRY_INTERVAL:-2}"
 
 # Parse database connection string if DB_URI is set
 if [ -n "$DB_URI" ]; then
-    # Extract host, port, and user from DB_URI
+    # Extract host, port, and user from DB_URI for pg_isready
     # Format: postgresql://user:password@host:port/database
-    if [[ $DB_URI =~ postgresql://([^:]+):([^@]+)@([^:]+):([^/]+)/(.+) ]]; then
+    if [[ $DB_URI =~ postgresql://([^:]+):[^@]+@([^:]+):([^/]+)/ ]]; then
         USER="${BASH_REMATCH[1]}"
-        HOST="${BASH_REMATCH[3]}"
-        PORT="${BASH_REMATCH[4]}"
-    elif [[ $DB_URI =~ postgresql://([^:]+):([^@]+)@([^/]+)/(.+) ]]; then
+        HOST="${BASH_REMATCH[2]}"
+        PORT="${BASH_REMATCH[3]}"
+    elif [[ $DB_URI =~ postgresql://([^:]+):[^@]+@([^/]+)/ ]]; then
         USER="${BASH_REMATCH[1]}"
-        HOST="${BASH_REMATCH[3]}"
+        HOST="${BASH_REMATCH[2]}"
         PORT="5432"
     fi
 fi
@@ -36,21 +36,35 @@ check_with_pg_isready() {
 
 # Function to check database using Python/psycopg2
 check_with_python() {
-    python3 -c "
+    # Export variables for Python to use securely
+    export _DB_HOST="$HOST"
+    export _DB_PORT="$PORT"
+    export _DB_USER="$USER"
+    export _DB_URI="$DB_URI"
+    
+    python3 -c '
 import sys
+import os
 import psycopg2
+
 try:
-    conn = psycopg2.connect(
-        host='$HOST',
-        port='$PORT',
-        user='$USER',
-        connect_timeout=5
-    )
+    # Try to use full DB_URI if available (includes password)
+    db_uri = os.environ.get("_DB_URI", "")
+    if db_uri:
+        conn = psycopg2.connect(db_uri, connect_timeout=5)
+    else:
+        # Fallback to individual parameters (no password)
+        conn = psycopg2.connect(
+            host=os.environ["_DB_HOST"],
+            port=os.environ["_DB_PORT"],
+            user=os.environ["_DB_USER"],
+            connect_timeout=5
+        )
     conn.close()
     sys.exit(0)
 except Exception:
     sys.exit(1)
-"
+'
     return $?
 }
 
