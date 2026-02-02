@@ -9,8 +9,9 @@ on:
       - master
     tags:
       - v*
-      - '!*-test*'
-      - '!*-rc*'
+    tags-ignore:
+      - '*-test*'
+      - '*-rc*'
   pull_request:
 
 env:
