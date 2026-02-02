@@ -419,7 +419,19 @@ POSTFIX_SERVER=10.0.0.1
 ```
 
 
-Before running the webapp, you need to prepare the database by running the migration:
+Before running the webapp, you need to prepare the database by running the migration.
+
+**Note**: The SimpleLogin containers include a database readiness check script (`scripts/wait-for-db.sh`) that uses `pg_isready` to ensure PostgreSQL is available before starting. If you need to manually wait for the database to be ready, you can run:
+
+```bash
+docker run --rm \
+    --name sl-db-wait \
+    -v $(pwd)/simplelogin.env:/code/.env \
+    --network="sl-network" \
+    simplelogin/app:3.4.0 bash /code/scripts/wait-for-db.sh
+```
+
+Now run the migration:
 
 ```bash
 docker run --rm \
@@ -430,7 +442,7 @@ docker run --rm \
     -v $(pwd)/dkim.pub.key:/dkim.pub.key \
     -v $(pwd)/simplelogin.env:/code/.env \
     --network="sl-network" \
-    simplelogin/app:3.4.0 flask db upgrade
+    simplelogin/app:3.4.0 bash -c "/code/scripts/wait-for-db.sh && flask db upgrade"
 ```
 
 This command could take a while to download the `simplelogin/app` docker image.
@@ -445,7 +457,7 @@ docker run --rm \
     -v $(pwd)/dkim.key:/dkim.key \
     -v $(pwd)/dkim.pub.key:/dkim.pub.key \
     --network="sl-network" \
-    simplelogin/app:3.4.0 python init_app.py
+    simplelogin/app:3.4.0 bash -c "/code/scripts/wait-for-db.sh && python init_app.py"
 ```
 
 Now, it's time to run the `webapp` container!
