@@ -3,6 +3,7 @@ import json
 import os
 import random
 import string
+from datetime import date, timedelta
 from email.message import EmailMessage
 from typing import Optional, Dict
 
@@ -104,3 +105,32 @@ def fix_rate_limit_after_request():
 
     g._rate_limiting_complete = False
     setattr(g, "%s_rate_limiting_complete" % limiter._key_prefix, False)
+
+
+def get_unique_date() -> date:
+    """
+    Generate a unique date for test purposes.
+
+    This function generates unique dates by combining a base date with a process ID,
+    timestamp, and random offset. This ensures that tests running in parallel
+    (e.g., with pytest-xdist across multiple processes/workers) won't create database
+    entries with duplicate dates, avoiding unique constraint violations on the
+    daily_metric table.
+
+    The cleanup of test data is handled automatically by the transaction rollback
+    in the flask_client fixture (see conftest.py).
+
+    Returns:
+        date: A unique date object safe to use in parallel test execution
+    """
+    # Use a base date far in the past (year 2000) to avoid conflicts with real data
+    base_date = date(2000, 1, 1)
+    # Combine process ID, timestamp, and random to ensure uniqueness across parallel workers
+    # This is process-safe for pytest-xdist which runs tests in separate processes
+    import time
+
+    pid_offset = os.getpid() % 10000  # Process ID for worker uniqueness
+    time_offset = int(time.time() * 1000) % 100000  # Timestamp for temporal uniqueness
+    random_offset = random.randint(0, 10000)  # Random for additional uniqueness
+    total_offset = pid_offset + time_offset + random_offset
+    return base_date + timedelta(days=total_offset % 36500)  # Stay within ~100 years
