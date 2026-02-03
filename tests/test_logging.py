@@ -4,9 +4,6 @@ Tests for logging configuration and log spam suppression.
 
 import logging
 import os
-from unittest.mock import patch
-
-import pytest
 
 
 def test_flanker_logger_suppressed_by_default():
@@ -14,9 +11,6 @@ def test_flanker_logger_suppressed_by_default():
     Test that flanker logger is set to ERROR level by default,
     suppressing INFO/DEBUG/WARNING spam.
     """
-    # Import after test setup to ensure our logging config is applied
-    from app.log import LOG
-
     # Get the flanker logger
     flanker_logger = logging.getLogger("flanker")
 
@@ -32,8 +26,6 @@ def test_spf_logger_suppressed_by_default():
     Test that spf logger is set to ERROR level by default,
     suppressing INFO/DEBUG/WARNING spam.
     """
-    from app.log import LOG
-
     # Get the spf logger
     spf_logger = logging.getLogger("spf")
 
@@ -48,8 +40,6 @@ def test_flanker_import_does_not_spam_logs(caplog):
     """
     Test that importing and using flanker does not create log spam.
     """
-    from app.log import LOG
-
     # Set up log capture at INFO level
     with caplog.at_level(logging.INFO):
         # Import flanker (this might trigger some internal logging)
@@ -63,7 +53,8 @@ def test_flanker_import_does_not_spam_logs(caplog):
 
         # Check that no flanker logs at INFO/DEBUG/WARNING level were captured
         flanker_logs = [
-            record for record in caplog.records
+            record
+            for record in caplog.records
             if record.name.startswith("flanker") and record.levelno < logging.ERROR
         ]
 
@@ -85,9 +76,9 @@ def test_log_level_from_environment():
     actual_level_name = logging.getLevelName(LOG.level)
 
     # In test environment, we expect INFO level
-    assert actual_level_name == expected_level_name, (
-        f"Expected log level {expected_level_name}, but got {actual_level_name}"
-    )
+    assert (
+        actual_level_name == expected_level_name
+    ), f"Expected log level {expected_level_name}, but got {actual_level_name}"
 
 
 def test_silence_flanker_logs_env_var_disables_suppression():
@@ -102,9 +93,7 @@ def test_silence_flanker_logs_env_var_disables_suppression():
 
     # Default should be "1" (enabled)
     # Can be overridden to "0" to disable suppression for debugging
-    assert silence_flag in ["0", "1"], (
-        "SILENCE_FLANKER_LOGS should be '0' or '1'"
-    )
+    assert silence_flag in ["0", "1"], "SILENCE_FLANKER_LOGS should be '0' or '1'"
 
 
 def test_app_logger_exists():
@@ -118,7 +107,7 @@ def test_app_logger_exists():
 
 def test_logger_has_custom_filters():
     """Test that the logger has the required custom filters."""
-    from app.log import LOG, EmailHandlerFilter, RequestIdFilter
+    from app.log import LOG
 
     # Check that LOG has filters
     filter_types = [type(f).__name__ for f in LOG.filters]
@@ -143,7 +132,7 @@ def test_email_handler_filter_adds_message_id():
         lineno=1,
         msg="test message",
         args=(),
-        exc_info=None
+        exc_info=None,
     )
 
     # Set a message ID
@@ -177,7 +166,7 @@ def test_request_id_filter_without_flask_context():
         lineno=1,
         msg="test message",
         args=(),
-        exc_info=None
+        exc_info=None,
     )
 
     # Apply filter (should not raise exception even without Flask context)
