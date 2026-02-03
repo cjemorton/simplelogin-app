@@ -30,14 +30,16 @@ app.config["WTF_CSRF_ENABLED"] = False
 app.config["SERVER_NAME"] = "sl.lan"
 
 # enable pg_trgm extension
+# Note: The extension is created by migrations (2021_082012_424808e1fe49_)
+# We only ensure it exists here, without dropping it to avoid CASCADE issues
 with engine.connect() as conn:
     try:
-        conn.execute("DROP EXTENSION if exists pg_trgm")
-        conn.execute("CREATE EXTENSION pg_trgm")
-    except sqlalchemy.exc.InternalError as e:
-        if isinstance(e.orig, errors.lookup(DEPENDENT_OBJECTS_STILL_EXIST)):
-            print(">>> pg_trgm can't be dropped, ignore")
-        conn.execute("Rollback")
+        conn.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm")
+        conn.commit()
+    except sqlalchemy.exc.ProgrammingError as e:
+        # Extension might already exist, which is fine
+        print(f">>> pg_trgm extension handling: {e}")
+        conn.rollback()
 
 add_sl_domains()
 add_proton_partner()

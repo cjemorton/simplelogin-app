@@ -3540,7 +3540,7 @@ class DailyMetric(Base, ModelMixin):
         daily_metric = DailyMetric.get_by(date=today)
         if not daily_metric:
             daily_metric = DailyMetric.create(
-                date=today, nb_new_web_non_proton_user=0, nb_alias=0
+                date=today, nb_new_web_non_proton_user=0, nb_alias=0, flush=True
             )
         return daily_metric
 
