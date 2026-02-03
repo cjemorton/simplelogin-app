@@ -119,9 +119,9 @@ def test_get_user_if_alias_would_auto_create(flask_client):
     for test_id, (address, expected_ok) in enumerate(get_auto_create_alias_tests(user)):
         result = get_user_if_alias_would_auto_create(address)
         if expected_ok:
-            assert (
-                isinstance(result, User) and result.id == user.id
-            ), f"Case {test_id} - Failed address {address}"
+            assert isinstance(result, User) and result.id == user.id, (
+                f"Case {test_id} - Failed address {address}"
+            )
         else:
             assert not result, f"Case {test_id} - Failed address {address}"
 

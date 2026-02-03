@@ -8,6 +8,7 @@ This command:
 3. Scans all mailboxes in batches of 100, doing the same check
 4. Skips emails that use SL domains
 """
+
 import argparse
 from typing import Optional, Set
 

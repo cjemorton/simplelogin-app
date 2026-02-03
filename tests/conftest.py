@@ -13,8 +13,6 @@ import sqlalchemy
 from app.db import Session, engine, connection
 from app.rate_limiter import set_rate_limit_enabled
 
-from psycopg2 import errors
-from psycopg2.errorcodes import DEPENDENT_OBJECTS_STILL_EXIST
 
 import pytest
 

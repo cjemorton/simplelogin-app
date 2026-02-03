@@ -173,7 +173,7 @@ class MailSender:
                 )
         if retries > 0:
             LOG.warning(
-                f"Retrying sending email due to error. {retries} retries left. Will wait {0.3*retries} seconds."
+                f"Retrying sending email due to error. {retries} retries left. Will wait {0.3 * retries} seconds."
             )
             time.sleep(0.3 * retries)
             return self._send_to_smtp(send_request, retries - 1)
