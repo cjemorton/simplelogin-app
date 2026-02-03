@@ -100,7 +100,7 @@ if _SILENCE_FLANKER_LOGS:
     # Set flanker logger to ERROR to suppress INFO/DEBUG/WARNING spam
     flanker_logger = logging.getLogger("flanker")
     flanker_logger.setLevel(logging.ERROR)
-    
+
     # Set spf logger to ERROR to suppress INFO/DEBUG/WARNING spam
     spf_logger = logging.getLogger("spf")
     spf_logger.setLevel(logging.ERROR)
