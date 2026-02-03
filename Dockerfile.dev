@@ -1,0 +1,93 @@
+####################
+# Stage 1: Build frontend assets with dev dependencies
+####################
+FROM node:20-alpine AS frontend-builder
+
+WORKDIR /code
+
+# Copy package files
+COPY ./static/package*.json /code/static/
+
+# Install all npm dependencies including dev dependencies
+RUN cd /code/static && npm ci
+
+####################
+# Stage 2: Development environment with all tools
+####################
+FROM python:3.12-alpine AS development
+
+# Build arguments
+ARG UV_VERSION="0.8.18"
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    CMAKE_POLICY_VERSION_MINIMUM=3.5 \
+    FLASK_ENV=development \
+    FLASK_DEBUG=1
+
+WORKDIR /code
+
+# Install all development dependencies including build tools
+# These remain in the dev image for live development
+RUN apk add --no-cache \
+    bash \
+    gcc \
+    g++ \
+    musl-dev \
+    postgresql-dev \
+    postgresql-client \
+    re2-dev \
+    cmake \
+    make \
+    ninja \
+    git \
+    curl \
+    libffi-dev \
+    openssl-dev \
+    cargo \
+    rust \
+    vim \
+    wget \
+    netcat-openbsd \
+    && rm -rf /var/cache/apk/*
+
+# Install uv for faster Python package management
+RUN curl -sSL "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/uv-x86_64-unknown-linux-musl.tar.gz" > uv.tar.gz \
+    && tar xf uv.tar.gz -C /tmp/ \
+    && mv /tmp/uv-x86_64-unknown-linux-musl/uv /usr/local/bin/uv \
+    && mv /tmp/uv-x86_64-unknown-linux-musl/uvx /usr/local/bin/uvx \
+    && rm -rf /tmp/uv* uv.tar.gz
+
+# Copy dependency files
+COPY pyproject.toml uv.lock .python-version ./
+
+# Install Python and all dependencies including dev dependencies
+RUN uv python install $(cat .python-version) \
+    && uv sync --locked --all-extras
+
+# Copy application code (in dev, we typically mount this as a volume)
+COPY . .
+
+# Copy frontend node_modules from builder
+COPY --from=frontend-builder /code/static/node_modules /code/static/node_modules
+
+# Create necessary directories
+RUN mkdir -p /code/static/upload /code/local_data
+
+# Set PATH to use virtual environment
+ENV PATH="/code/.venv/bin:$PATH"
+
+# Expose application port
+EXPOSE 7777
+
+# Expose debugger port (for Python debuggers like debugpy)
+EXPOSE 5678
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD wget --no-verbose --tries=1 --spider http://localhost:7777/health || exit 1
+
+# Development command with auto-reload
+# In practice, this is often overridden in docker-compose for specific needs
+CMD ["flask", "run", "--host=0.0.0.0", "--port=7777", "--reload", "--debug"]

@@ -52,8 +52,8 @@ jobs:
     services:
       # label used to access the service container
       postgres:
-        # Docker Hub image
-        image: postgres:13
+        # Docker Hub image - using PostgreSQL 16 (latest stable)
+        image: postgres:16-alpine
         # service environment variables
         # `POSTGRES_HOST` is `postgres`
         env:
@@ -166,13 +166,24 @@ jobs:
           scripts/generate-build-info.sh ${{ github.sha }} ${{ github.ref_name }}
           cat app/build_info.py
 
-      - name: Build image and publish to Docker Registry
+      - name: Build and push production image
         uses: docker/build-push-action@v3
         with:
           context: .
-          platforms: linux/amd64
+          file: ./Dockerfile.production
+          platforms: linux/amd64,linux/arm64
           push: true
           tags: ${{ steps.meta.outputs.tags }}
+          labels: |
+            org.opencontainers.image.title=SimpleLogin
+            org.opencontainers.image.description=Open source email alias solution
+            org.opencontainers.image.version=${{ github.ref_name }}
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.created=${{ steps.meta.outputs.created }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            UV_VERSION=${{ env.UV_VERSION }}
 
 
       #- name: Send Telegram message

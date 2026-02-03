@@ -1,6 +1,7 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # wait-for-db.sh - Wait for PostgreSQL to be ready
 # Uses pg_isready by default, falls back to Python/psycopg2 if unavailable
+# Compatible with Alpine Linux and standard Linux distributions
 
 set -e
 

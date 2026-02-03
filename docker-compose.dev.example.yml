@@ -1,0 +1,165 @@
+# Docker Compose configuration for SimpleLogin development
+# This is an EXAMPLE file - copy to docker-compose.yml and customize for your environment
+#
+# Usage:
+#   cp docker-compose.dev.example.yml docker-compose.yml
+#   # Edit docker-compose.yml with your configuration
+#   docker-compose up -d
+
+version: '3.8'
+
+services:
+  # PostgreSQL database
+  db:
+    image: postgres:16-alpine
+    container_name: simplelogin-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: simplelogin
+    ports:
+      - "15432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d simplelogin"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # Redis for caching and sessions
+  redis:
+    image: redis:7-alpine
+    container_name: simplelogin-redis
+    restart: unless-stopped
+    ports:
+      - "16379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # SimpleLogin application (development mode)
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+      args:
+        UV_VERSION: "0.8.18"
+    container_name: simplelogin-app
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "7777:7777"    # Application port
+      - "5678:5678"    # Python debugger port (debugpy)
+    volumes:
+      # Mount source code for live reload
+      - .:/code
+      # Prevent overwriting virtual environment
+      - /code/.venv
+      # Persist local data
+      - ./local_data:/code/local_data
+      # Persist uploads
+      - ./static/upload:/code/static/upload
+    environment:
+      # Database configuration
+      DB_URI: postgresql://myuser:mypassword@db:5432/simplelogin
+      
+      # Redis configuration
+      REDIS_URL: redis://redis:6379/0
+      
+      # Flask development settings
+      FLASK_ENV: development
+      FLASK_DEBUG: 1
+      
+      # Email settings (configure for your mail server)
+      EMAIL_DOMAIN: yourdomain.com
+      EMAIL_SERVERS_WITH_PRIORITY: [(10, "mail.yourdomain.com.")]
+      SUPPORT_EMAIL: support@yourdomain.com
+      
+      # URLs
+      URL: http://localhost:7777
+      
+      # Security (generate your own secure keys!)
+      SECRET_KEY: change-this-to-something-random
+      
+      # Disable features for development
+      POSTFIX_SERVER: ""
+      DISABLE_ONBOARDING: 1
+      
+    # Override default command for development with auto-reload
+    command: >
+      sh -c "
+        python scripts/wait-for-db.sh &&
+        uv run alembic upgrade head &&
+        uv run flask run --host=0.0.0.0 --port=7777 --reload --debug
+      "
+    healthcheck:
+      test: ["CMD", "wget", "--quiet", "--tries=1", "--spider", "http://localhost:7777/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Email handler (optional - for receiving emails)
+  email-handler:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: simplelogin-email-handler
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    ports:
+      - "20381:20381"  # Email handler port
+    volumes:
+      - .:/code
+      - /code/.venv
+      - ./local_data:/code/local_data
+    environment:
+      DB_URI: postgresql://myuser:mypassword@db:5432/simplelogin
+      REDIS_URL: redis://redis:6379/0
+      EMAIL_DOMAIN: yourdomain.com
+      URL: http://localhost:7777
+    command: python email_handler.py
+    profiles:
+      - email  # Use: docker-compose --profile email up
+
+  # Job runner for background tasks (optional)
+  job-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: simplelogin-job-runner
+    restart: unless-stopped
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - .:/code
+      - /code/.venv
+    environment:
+      DB_URI: postgresql://myuser:mypassword@db:5432/simplelogin
+      REDIS_URL: redis://redis:6379/0
+    command: python job_runner.py
+    profiles:
+      - jobs  # Use: docker-compose --profile jobs up
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  default:
+    name: simplelogin-network

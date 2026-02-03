@@ -1,10 +1,14 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# generate-build-info.sh - Generate build information file for the application
+# Usage: ./generate-build-info.sh SHA VERSION
+
+set -e
 
 SCRIPT_DIR="$(cd "$(dirname "$0")" || exit 1; pwd -P)"
 REPO_ROOT=$(echo "${SCRIPT_DIR}" | sed 's:scripts::g')
 BUILD_INFO_FILE="${REPO_ROOT}/app/build_info.py"
 
-if [[ -z "$2" ]]; then
+if [ -z "$2" ]; then
   echo "Invalid usage. Usage: $0 SHA VERSION"
   exit 1
 fi

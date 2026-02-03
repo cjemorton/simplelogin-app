@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+# generate-proto-files.sh - Generate Python files from protobuf definitions
+# Requires protoc (protobuf compiler) to be installed
 
 set -euxo pipefail
 

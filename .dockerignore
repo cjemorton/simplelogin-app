@@ -1,17 +1,90 @@
-.idea/
-*.pyc
-db.sqlite
-.env
-.pytest_cache
-.vscode
-.DS_Store
-config
-adhoc
-static/node_modules
-db.sqlite-journal
-static/upload
-venv/
-.venv
-.coverage
-htmlcov
+# Git and version control
 .git/
+.gitignore
+.gitattributes
+
+# IDE and editor files
+.idea/
+.vscode/
+.DS_Store
+*.swp
+*.swo
+*~
+
+# Python bytecode and cache
+*.pyc
+*.pyo
+*.pyd
+__pycache__/
+*.so
+*.egg
+*.egg-info/
+.eggs/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Testing and coverage
+tests/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+pytest.ci.ini
+coverage.ini
+
+# Documentation and samples
+docs/
+*.md
+!README.md
+CHANGELOG
+LICENSE
+
+# Development and build artifacts
+.env
+.env.*
+example.env
+db.sqlite
+db.sqlite-journal
+*.lock
+!uv.lock
+poetry.lock
+requirements*.lock
+
+# Local data and uploads
+local_data/
+static/upload/
+adhoc/
+config/
+
+# Node/NPM
+static/node_modules/
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# CI/CD
+.github/
+.pre-commit-config.yaml
+.flake8
+.pylintrc
+.jshintrc
+
+# Temporary and log files
+*.log
+*.tmp
+tmp/
+temp/
+
+# Build artifacts not needed in container
+dist/
+build/
+*.tar.gz
+*.zip

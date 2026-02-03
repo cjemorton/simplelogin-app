@@ -29,6 +29,23 @@
 
 ---
 
+## 🚀 New: Alpine-based Docker Architecture
+
+SimpleLogin now uses **Alpine Linux-based Docker images** with significant improvements:
+
+- ✅ **60-70% smaller images** (~450MB vs ~1.2GB)
+- ✅ **Enhanced security** with minimal attack surface
+- ✅ **Multi-architecture support** (amd64 + arm64)
+- ✅ **Faster builds** with optimized layer caching
+- ✅ **Separate dev/prod** Dockerfiles for better workflow
+- ✅ **Latest dependencies** (PostgreSQL 16, Python 3.12, Node 20)
+
+**Upgrading from older versions?** See the [Migration Guide](./docs/MIGRATION-ALPINE.md)
+
+**Building images?** See [Build Documentation](./docs/build-image.md)
+
+---
+
 Your email address is your **online identity**. When you use the same email address everywhere, you can be easily tracked.
 More information on https://simplelogin.io
 
@@ -37,6 +54,15 @@ This README contains instructions on how to self host SimpleLogin.
 Once you have your own SimpleLogin instance running, you can change the `API URL` in SimpleLogin's Chrome/Firefox extension, Android/iOS app to your server.
 
 SimpleLogin roadmap is at https://github.com/simple-login/app/projects/1 and our forum at https://github.com/simple-login/app/discussions, feel free to submit new ideas or vote on features.
+
+## Documentation
+
+- 📖 [Quick Start Build Guide](./docs/QUICK-START-BUILD.md) - Get started quickly
+- 🔄 [Migration Guide](./docs/MIGRATION-ALPINE.md) - Migrate to Alpine-based images
+- 🏗️ [Build Documentation](./docs/build-image.md) - Build custom images
+- 🤝 [Contributing Guide](./docs/CONTRIBUTING.md) - Contribute to SimpleLogin
+- 🔒 [Security Policy](./docs/SECURITY.md) - Report security issues
+- 📚 [Full Documentation Index](./docs/) - All documentation
 
 ### Prerequisites
 
