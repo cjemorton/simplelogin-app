@@ -33,13 +33,13 @@ app.config["SERVER_NAME"] = "sl.lan"
 # Note: The extension is created by migrations (2021_082012_424808e1fe49_)
 # We only ensure it exists here, without dropping it to avoid CASCADE issues
 with engine.connect() as conn:
-    try:
-        conn.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm")
-        conn.commit()
-    except sqlalchemy.exc.ProgrammingError as e:
-        # Extension might already exist, which is fine
-        print(f">>> pg_trgm extension handling: {e}")
-        conn.rollback()
+    with conn.begin():
+        try:
+            conn.execute(sqlalchemy.text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
+        except sqlalchemy.exc.ProgrammingError as e:
+            # This would indicate a permission issue or other problem
+            print(f">>> Unable to create pg_trgm extension: {e}")
+            raise
 
 add_sl_domains()
 add_proton_partner()

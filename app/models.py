@@ -3536,6 +3536,16 @@ class DailyMetric(Base, ModelMixin):
 
     @staticmethod
     def get_or_create_today_metric() -> DailyMetric:
+        """Get or create the daily metric for today.
+        
+        Uses flush=True to ensure the created record is immediately visible
+        within the current transaction, preventing duplicate key violations
+        when called multiple times in the same transaction (e.g., in tests).
+        
+        Note: For concurrent production scenarios, database-level constraints
+        will raise IntegrityError if multiple processes create simultaneously.
+        The caller should handle this case if needed.
+        """
         today = arrow.utcnow().date()
         daily_metric = DailyMetric.get_by(date=today)
         if not daily_metric:
