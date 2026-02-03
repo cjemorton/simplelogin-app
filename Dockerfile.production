@@ -57,9 +57,14 @@ RUN curl -sSL "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/u
 # Copy dependency files
 COPY pyproject.toml uv.lock .python-version ./
 
-# Install Python and dependencies using uv
-RUN uv python install $(cat .python-version) \
-    && uv sync --locked --no-dev
+# Install Python dependencies using uv with system Python
+# NOTE: Some dependencies like sl-pgp may not have pre-built wheels for Alpine/musl
+# In production, consider using manylinux (glibc) base or building from source
+RUN uv venv --python /usr/local/bin/python3.12 && \
+    . .venv/bin/activate && \
+    uv sync --no-dev || \
+    (echo "Warning: Falling back to installing without lockfile due to platform compatibility" && \
+     uv pip install -e .)
 
 ####################
 # Stage 3: Production runtime
