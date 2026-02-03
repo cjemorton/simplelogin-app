@@ -165,5 +165,5 @@ SimpleLogin is licensed under the MIT License. See [LICENSE](../LICENSE) for det
 
 ---
 
-**Last Updated**: 2026-02-03  
+**Last Updated**: 2026-02-03
 **SimpleLogin Version**: 4.x (current development)

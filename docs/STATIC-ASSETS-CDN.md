@@ -138,15 +138,15 @@ STATIC_URL = STATIC_URL.rstrip("/")
    server {
        listen 80;
        server_name static.yourdomain.com;
-       
+
        root /var/www/simplelogin/static;
-       
+
        location / {
            expires 1y;
            add_header Cache-Control "public, immutable";
            add_header X-Content-Type-Options "nosniff";
        }
-       
+
        # Enable compression
        gzip on;
        gzip_types text/css application/javascript image/svg+xml;
@@ -222,7 +222,7 @@ if [ "$MODE" = "s3" ]; then
         --cache-control "public, max-age=31536000" \
         --exclude "*.md" \
         --exclude "package*.json"
-    
+
     echo "Invalidating CloudFront cache..."
     aws cloudfront create-invalidation \
         --distribution-id "$CLOUDFRONT_DISTRIBUTION_ID" \
@@ -260,7 +260,7 @@ def asset_url(filename):
             with open(filepath, 'rb') as f:
                 file_hash = hashlib.md5(f.read()).hexdigest()[:8]
             return f"{config.STATIC_URL}/{filename}?v={file_hash}"
-    
+
     # For CDN, use app version
     return f"{config.STATIC_URL}/{filename}?v={config.VERSION}"
 ```

@@ -216,7 +216,7 @@ sudo chown -R 1000:1000 /path/to/volumes
 
 **Symptom**: Can't connect to PostgreSQL
 
-**Solution**: 
+**Solution**:
 1. Verify PostgreSQL is running: `docker-compose ps`
 2. Check connection string in `.env`
 3. Ensure database is ready: `docker-compose logs db`

@@ -72,29 +72,29 @@ services:
     environment:
       # Database configuration
       DB_URI: postgresql://myuser:mypassword@db:5432/simplelogin
-      
+
       # Redis configuration
       REDIS_URL: redis://redis:6379/0
-      
+
       # Flask development settings
       FLASK_ENV: development
       FLASK_DEBUG: 1
-      
+
       # Email settings (configure for your mail server)
       EMAIL_DOMAIN: yourdomain.com
-      EMAIL_SERVERS_WITH_PRIORITY: [(10, "mail.yourdomain.com.")]
+      EMAIL_SERVERS_WITH_PRIORITY: '[(10, "mail.yourdomain.com.")]'
       SUPPORT_EMAIL: support@yourdomain.com
-      
+
       # URLs
       URL: http://localhost:7777
-      
+
       # Security (generate your own secure keys!)
       SECRET_KEY: change-this-to-something-random
-      
+
       # Disable features for development
       POSTFIX_SERVER: ""
       DISABLE_ONBOARDING: 1
-      
+
     # Override default command for development with auto-reload
     command: >
       sh -c "

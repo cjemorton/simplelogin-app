@@ -62,7 +62,7 @@ RUN curl -sSL "https://github.com/astral-sh/uv/releases/download/${UV_VERSION}/u
 # Copy dependency files
 COPY pyproject.toml uv.lock .python-version ./
 
-# Install Python and all dependencies including dev dependencies  
+# Install Python and all dependencies including dev dependencies
 # Set UV_PYTHON_PREFERENCE=only-system to force using system Python
 ENV UV_PYTHON_PREFERENCE=only-system
 RUN uv venv --python python3.12 && \
