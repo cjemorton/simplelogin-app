@@ -201,7 +201,7 @@ docker buildx build \
 
 ### Issue: Multi-arch build very slow
 
-**Solution**: 
+**Solution**:
 1. Use GitHub Actions or dedicated build servers
 2. Enable BuildKit cache
 3. Use qemu-user-static for cross-compilation

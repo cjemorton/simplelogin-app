@@ -327,6 +327,6 @@ The changes maintain backward compatibility while positioning SimpleLogin for mo
 
 ---
 
-**Date**: 2026-02-03  
-**Version**: 4.x (current development)  
+**Date**: 2026-02-03
+**Version**: 4.x (current development)
 **Status**: ✅ Complete, ready for review
