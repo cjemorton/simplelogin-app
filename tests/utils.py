@@ -3,6 +3,7 @@ import json
 import os
 import random
 import string
+from datetime import date, timedelta
 from email.message import EmailMessage
 from typing import Optional, Dict
 
@@ -13,6 +14,9 @@ from app.db import Session
 from app.models import User, PartnerUser, UserAliasDeleteAction
 from app.proton.proton_partner import get_proton_partner
 from app.utils import random_string
+
+# Counter for generating unique dates in tests to avoid DB unique constraint violations
+_date_counter = 0
 
 
 def create_new_user(
@@ -104,3 +108,25 @@ def fix_rate_limit_after_request():
 
     g._rate_limiting_complete = False
     setattr(g, "%s_rate_limiting_complete" % limiter._key_prefix, False)
+
+
+def get_unique_date() -> date:
+    """
+    Generate a unique date for test purposes.
+    
+    This function generates unique dates by combining a base date with an incrementing counter
+    and a random offset. This ensures that tests running in parallel (e.g., with pytest-xdist)
+    won't create database entries with duplicate dates, avoiding unique constraint violations
+    on the daily_metric table.
+    
+    Returns:
+        date: A unique date object safe to use in parallel test execution
+    """
+    global _date_counter
+    _date_counter += 1
+    # Use a base date far in the past (year 2000) to avoid conflicts with real data
+    # Add counter + random offset to ensure uniqueness across parallel test runs
+    base_date = date(2000, 1, 1)
+    # Random offset up to 10000 days plus counter to ensure uniqueness
+    offset_days = _date_counter + random.randint(0, 10000)
+    return base_date + timedelta(days=offset_days)

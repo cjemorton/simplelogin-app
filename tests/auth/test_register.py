@@ -5,7 +5,7 @@ from app import config
 from app.db import Session
 from app.models import DailyMetric, User
 from app.utils import canonicalize_email
-from tests.utils import create_new_user, random_email
+from tests.utils import create_new_user, random_email, get_unique_date
 
 
 def setup_module():
@@ -29,15 +29,31 @@ def test_register_success(flask_client):
     assert b"An email to validate your email is on its way" in r.data
 
 
-def test_register_increment_nb_new_web_non_proton_user(flask_client):
-    # Clear any existing daily metric for today to avoid unique constraint violations
-    today = arrow.utcnow().date()
-    existing_metric = DailyMetric.get_by(date=today)
-    if existing_metric:
-        Session.delete(existing_metric)
-        Session.commit()
-
-    daily_metric = DailyMetric.get_or_create_today_metric()
+def test_register_increment_nb_new_web_non_proton_user(flask_client, monkeypatch):
+    """Test that registration increments the daily metric counter.
+    
+    This test uses a unique date to avoid unique constraint violations when tests
+    run in parallel (e.g., with pytest-xdist across multiple shards).
+    """
+    # Generate a unique test date to avoid conflicts with other parallel tests
+    test_date = get_unique_date()
+    
+    # Mock arrow.utcnow() to return our test date
+    class MockArrow:
+        @staticmethod
+        def date():
+            return test_date
+    
+    def mock_utcnow():
+        return MockArrow()
+    
+    # Patch arrow.utcnow in the models module where get_or_create_today_metric is defined
+    monkeypatch.setattr("app.models.arrow.utcnow", mock_utcnow)
+    
+    # Create the daily metric for our test date
+    daily_metric = DailyMetric.create(
+        date=test_date, nb_new_web_non_proton_user=0, nb_alias=0
+    )
     Session.commit()
     nb_new_web_non_proton_user = daily_metric.nb_new_web_non_proton_user
 
@@ -48,8 +64,9 @@ def test_register_increment_nb_new_web_non_proton_user(flask_client):
     )
 
     assert r.status_code == 200
-    new_daily_metric = DailyMetric.get_or_create_today_metric()
-    assert new_daily_metric.nb_new_web_non_proton_user == nb_new_web_non_proton_user + 1
+    # Verify the metric was incremented
+    Session.refresh(daily_metric)
+    assert daily_metric.nb_new_web_non_proton_user == nb_new_web_non_proton_user + 1
 
 
 def test_register_disabled(flask_client):
