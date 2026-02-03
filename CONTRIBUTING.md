@@ -5,6 +5,43 @@ We can also discuss the best way to implement it.
 
 The project uses Flask, Python3.7+ and requires Postgres 12+ as dependency.
 
+## 🚨 MANDATORY: Code Quality and CI Requirements
+
+**IMPORTANT: All contributors (including Copilot/AI agents) MUST follow these guidelines unless explicitly told otherwise.**
+
+### Pre-commit Hooks (REQUIRED)
+
+**Before pushing any code**, you MUST:
+
+1. **Install pre-commit hooks** in your local environment:
+   ```bash
+   uv run pre-commit install
+   ```
+
+2. **Run pre-commit checks** before committing:
+   ```bash
+   uv run pre-commit run --all-files
+   ```
+
+3. **Fix all issues** reported by pre-commit before pushing. This includes:
+   - Trailing whitespace removal
+   - Code formatting (ruff, djlint)
+   - YAML validation
+   - Other linting checks
+
+**Why this matters:** Pre-commit hooks enforce code quality standards. Failing to run them will cause CI failures and block your PR from being merged.
+
+### Database Configuration for Tests/CI (REQUIRED)
+
+**All tests, migration scripts, and CI configurations MUST use database user `test`** (NOT `root` or any other user).
+
+**Required configurations:**
+- **Test environment** (`tests/test.env`): `DB_URI=postgresql://test:test@localhost:15432/test`
+- **CI workflows** (`.github/workflows/*.yml`): `POSTGRES_USER: test`
+- **Test scripts** (`scripts/run-test.sh`, `scripts/reset_test_db.sh`): Use `-e POSTGRES_USER=test`
+
+**Why this matters:** The GitHub Actions CI environment uses the `test` user. Using any other user (especially `root`) will cause test failures with error: `FATAL: role "root" does not exist`.
+
 ## General Architecture
 
 <p align="center">
@@ -52,13 +89,13 @@ brew install -s re2 pybind11
 
 ## Linting and static analysis
 
-We use pre-commit to run all our linting and static analysis checks. Please run
+We use pre-commit to run all our linting and static analysis checks. **This is mandatory - see [Code Quality and CI Requirements](#-mandatory-code-quality-and-ci-requirements) section above.**
 
 ```bash
 uv run pre-commit install
 ```
 
-To install it in your development environment.
+To install it in your development environment. Always run `uv run pre-commit run --all-files` before pushing code.
 
 ## CI/CD & Testing Standards
 

@@ -89,7 +89,7 @@ jobs:
   test:
     # Using ubuntu-22.04: Latest stable LTS runner
     runs-on: ubuntu-22.04
-    
+
     # Matrix strategy: Splits test suite into 4 parallel shards
     # This reduces total test time by ~4x (minus overhead)
     # Each shard runs a subset of tests determined by pytest-xdist
