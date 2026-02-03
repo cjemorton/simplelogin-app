@@ -15,8 +15,8 @@ warnings.filterwarnings("ignore", category=SyntaxWarning)
 
 # Determine log level from environment
 # Default to INFO for production, can override with LOG_LEVEL env var
-_DEFAULT_LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
-_LOG_LEVEL = getattr(logging, _DEFAULT_LOG_LEVEL, logging.INFO)
+_LOG_LEVEL_STR = os.environ.get("LOG_LEVEL", "INFO").upper()
+_LOG_LEVEL = getattr(logging, _LOG_LEVEL_STR, logging.INFO)
 
 # this format allows clickable link to code source in PyCharm
 _log_format = (
@@ -102,9 +102,6 @@ if _SILENCE_FLANKER_LOGS:
     spf_logger = logging.getLogger("spf")
     spf_logger.setLevel(logging.ERROR)
 
-
-# Replace print statement with logger for initialization message
-# Kept as comment for reference: print(">>> init logging <<<")
 
 # Disable flask logs such as 127.0.0.1 - - [15/Feb/2013 10:52:22] "GET /index.html HTTP/1.1" 200
 log = logging.getLogger("werkzeug")

@@ -73,17 +73,18 @@ def test_flanker_import_does_not_spam_logs(caplog):
 def test_log_level_from_environment():
     """
     Test that LOG_LEVEL environment variable controls the log level.
-    Note: This test may not work as expected in the current test run since
-    logging is configured at import time. It's here for documentation purposes.
     """
-    from app.log import LOG, _LOG_LEVEL
+    from app.log import LOG
     
-    # The log level should be determined from environment at import time
-    # Default is INFO
-    expected_level = os.environ.get("LOG_LEVEL", "INFO").upper()
+    # The log level should be INFO by default (as set in test environment)
+    # or whatever was configured via LOG_LEVEL env var
+    expected_level_name = os.environ.get("LOG_LEVEL", "INFO").upper()
+    actual_level_name = logging.getLevelName(LOG.level)
     
-    # Verify the internal log level variable matches
-    assert logging.getLevelName(_LOG_LEVEL) == expected_level or _LOG_LEVEL == logging.INFO
+    # In test environment, we expect INFO level
+    assert actual_level_name == expected_level_name, (
+        f"Expected log level {expected_level_name}, but got {actual_level_name}"
+    )
 
 
 def test_silence_flanker_logs_env_var_disables_suppression():
