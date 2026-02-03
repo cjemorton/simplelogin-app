@@ -29,9 +29,9 @@ app.config["SERVER_NAME"] = "sl.lan"
 # enable pg_trgm extension
 with engine.connect() as conn:
     try:
-        conn.execute(sqlalchemy.text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
+        conn.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm")
         conn.commit()
-    except Exception as e:
+    except sqlalchemy.exc.SQLAlchemyError as e:
         print(f">>> Error creating pg_trgm extension: {e}")
         conn.rollback()
 
