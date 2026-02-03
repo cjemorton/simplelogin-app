@@ -15,7 +15,7 @@ DEPENDENCIES UPGRADED
    - Key Change: 64-char local part limit now optional (RFC compliant)
 
 2. dkimpy: 1.0.5 → 1.1.8
-   - Security: ✅ No vulnerabilities  
+   - Security: ✅ No vulnerabilities
    - Breaking Changes: None affecting codebase
    - Key Change: Python 3.5+ required (✓), Ed25519 support added
 
@@ -54,7 +54,7 @@ FILES MODIFIED
 1. pyproject.toml - Updated version constraints
 2. uv.lock - Updated dependency lock
 3. requirements.lock - Regenerated production requirements
-4. requirements-dev.lock - Regenerated development requirements  
+4. requirements-dev.lock - Regenerated development requirements
 5. DEPENDENCY_UPGRADE_REPORT.md - Comprehensive analysis report
 
 ================================================================================
@@ -78,7 +78,7 @@ CONCLUSION
 
 This upgrade is SAFE and RECOMMENDED. It brings:
 - Better Python 3.12 compatibility
-- More RFC-compliant email validation  
+- More RFC-compliant email validation
 - Improved TLD/PSL handling
 - Updated, maintained dependencies
 - Zero breaking changes
