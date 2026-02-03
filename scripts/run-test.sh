@@ -1,5 +1,5 @@
 # Run tests locally or in CI
-# 
+#
 # PREREQUISITES:
 # Make sure pytest-xdist and pytest-shard are installed for parallelization:
 #   uv pip install pytest-xdist pytest-shard
@@ -7,7 +7,7 @@
 # LOCAL DEVELOPMENT:
 # For faster local testing, use pytest-xdist to run tests in parallel:
 #   uv run pytest -n auto
-# 
+#
 # For testing a specific shard (useful for debugging CI failures):
 #   uv run pytest --shard-id=1 --num-shards=4 -n auto
 #
