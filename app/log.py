@@ -11,6 +11,9 @@ from app.config import (
 )
 
 # Suppress SyntaxWarnings from dependencies
+# Some third-party libraries (e.g., older versions of libraries) may trigger
+# SyntaxWarnings that are not relevant to our application code. These are typically
+# safe to suppress in production environments.
 warnings.filterwarnings("ignore", category=SyntaxWarning)
 
 # Determine log level from environment

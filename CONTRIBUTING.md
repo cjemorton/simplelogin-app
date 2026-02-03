@@ -97,13 +97,24 @@ The logger provides convenient shortcut methods:
 LOG.debug("Debug message")
 LOG.info("Info message")
 LOG.warning("Warning message")
-LOG.exception("Error with traceback")
+LOG.exception("Error with traceback")  # Must be in exception handler
 
 # Shortcut methods (same as above)
 LOG.d("Debug message")
 LOG.i("Info message")
 LOG.w("Warning message")
-LOG.e("Error with traceback")
+LOG.e("Error with traceback")  # Must be in exception handler
+```
+
+**Important**: Use `LOG.exception()` (or `LOG.e()`) only within exception handlers to automatically capture the stack trace:
+
+```python
+try:
+    risky_operation()
+except Exception:
+    LOG.exception("Failed to process operation")  # Automatically includes traceback
+    # or with more context:
+    # LOG.exception("Failed to process operation for user %s", user_id)
 ```
 
 ### Log Levels

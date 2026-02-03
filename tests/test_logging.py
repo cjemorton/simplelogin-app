@@ -122,3 +122,67 @@ def test_logger_has_custom_filters():
     
     assert "EmailHandlerFilter" in filter_types, "LOG should have EmailHandlerFilter"
     assert "RequestIdFilter" in filter_types, "LOG should have RequestIdFilter"
+
+
+def test_email_handler_filter_adds_message_id():
+    """Test that EmailHandlerFilter correctly adds message_id to log records."""
+    from app.log import EmailHandlerFilter, set_message_id
+    import logging
+    
+    # Create a filter instance
+    filter_instance = EmailHandlerFilter()
+    
+    # Create a dummy log record
+    record = logging.LogRecord(
+        name="test",
+        level=logging.INFO,
+        pathname="test.py",
+        lineno=1,
+        msg="test message",
+        args=(),
+        exc_info=None
+    )
+    
+    # Set a message ID
+    test_message_id = "test-message-123"
+    set_message_id(test_message_id)
+    
+    # Apply filter
+    result = filter_instance.filter(record)
+    
+    # Verify the filter returns True (record should be logged)
+    assert result is True
+    
+    # Verify message_id was added to the record
+    assert hasattr(record, "message_id")
+    assert record.message_id == test_message_id
+
+
+def test_request_id_filter_without_flask_context():
+    """Test that RequestIdFilter handles missing Flask context gracefully."""
+    from app.log import RequestIdFilter
+    import logging
+    
+    # Create a filter instance
+    filter_instance = RequestIdFilter()
+    
+    # Create a dummy log record
+    record = logging.LogRecord(
+        name="test",
+        level=logging.INFO,
+        pathname="test.py",
+        lineno=1,
+        msg="test message",
+        args=(),
+        exc_info=None
+    )
+    
+    # Apply filter (should not raise exception even without Flask context)
+    result = filter_instance.filter(record)
+    
+    # Verify the filter returns True (record should be logged)
+    assert result is True
+    
+    # Verify request_id was added (should be empty string outside request context)
+    assert hasattr(record, "request_id")
+    assert record.request_id == ""
