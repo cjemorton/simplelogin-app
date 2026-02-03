@@ -64,7 +64,52 @@ To install it in your development environment.
 
 All files must be free of trailing whitespace. This is enforced via pre-commit hooks.
 
-Run `pre-commit run --all-files` before committing to ensure all linters pass.
+Before submitting any code changes, you must run the following lint and format checks:
+
+### Pre-commit Hooks (Recommended)
+
+Run all pre-commit hooks to check all files:
+
+```bash
+uv run pre-commit run --all-files
+```
+
+This will automatically check for:
+- Trailing whitespace
+- YAML syntax
+- Code formatting (ruff)
+- HTML template formatting (djlint)
+
+### Individual Linting Tools
+
+You can also run individual tools if needed:
+
+#### Python Code Formatting
+```bash
+uv run ruff format .
+```
+
+#### Python Code Linting
+```bash
+uv run flake8
+```
+
+Or use ruff for faster linting:
+```bash
+uv run ruff check .
+```
+
+#### HTML Template Checking
+```bash
+uv run djlint --check templates
+```
+
+To automatically reformat templates:
+```bash
+uv run djlint --reformat .
+```
+
+**Important**: All of these checks must pass before your pull request can be merged. Running `uv run pre-commit run --all-files` is the easiest way to ensure compliance.
 
 ## Logging Best Practices
 
@@ -156,10 +201,10 @@ When writing tests that involve logging:
 def test_something(caplog):
     """Test that uses pytest's caplog fixture to capture logs."""
     from app.log import LOG
-    
+
     # Your test code that logs
     LOG.info("Test message")
-    
+
     # Verify log messages
     assert "Test message" in caplog.text
 ```
@@ -273,29 +318,20 @@ Here are the small sum-ups of the directory structures and their roles:
 
 ## Pull request
 
-The code is formatted using [ruff](https://github.com/astral-sh/ruff), to format the code, simply run
+Before creating a pull request, please ensure all code quality checks pass as described in the [Code Quality Requirements](#code-quality-requirements) section above.
 
-```
-uv run ruff format .
-```
-
-The code is also checked with `flake8`, make sure to run `flake8` before creating the pull request by
+The easiest way to verify this is to run:
 
 ```bash
-uv run flake8
+uv run pre-commit run --all-files
 ```
 
-For HTML templates, we use `djlint`. Before creating a pull request, please run
-
-```bash
-uv run djlint --check templates
-```
-
-If some files aren't properly formatted, you can format all files with
-
-```bash
-uv run djlint --reformat .
-```
+This single command will run all required checks including:
+- Code formatting (ruff)
+- Linting (flake8, ruff)
+- HTML template formatting (djlint)
+- Trailing whitespace checks
+- YAML syntax validation
 
 ## Test sending email
 
