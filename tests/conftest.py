@@ -37,6 +37,23 @@ add_sl_domains()
 add_proton_partner()
 
 
+@pytest.fixture(scope="session", autouse=True)
+def clear_daily_metric_table():
+    """
+    Clear the daily_metric table before test session starts.
+    
+    This prevents duplicate key violations on the daily_metric_date_key constraint
+    when tests run in parallel (e.g., with pytest-xdist). The table is cleared once
+    at the start of the test session to ensure a clean state.
+    """
+    with engine.connect() as conn:
+        try:
+            conn.execute(sqlalchemy.text("DELETE FROM daily_metric"))
+            conn.commit()
+        except sqlalchemy.exc.SQLAlchemyError as e:
+            print(f">>> Warning: Could not clear daily_metric table: {e}")
+
+
 @pytest.fixture
 def flask_app():
     yield app
