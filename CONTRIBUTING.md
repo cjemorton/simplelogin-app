@@ -66,6 +66,105 @@ All files must be free of trailing whitespace. This is enforced via pre-commit h
 
 Run `pre-commit run --all-files` before committing to ensure all linters pass.
 
+## Logging Best Practices
+
+SimpleLogin uses centralized logging configured in `app/log.py`. Please follow these guidelines:
+
+### Using the Logger
+
+Always use the centralized logger, never use `print()` for application logging:
+
+```python
+from app.log import LOG
+
+# Good: Use the logger
+LOG.info("Processing email for user %s", user.email)
+LOG.debug("Detailed debug information: %s", data)
+LOG.warning("Potential issue detected: %s", issue)
+LOG.error("Error occurred: %s", error_msg)
+LOG.exception("Exception with traceback")  # Automatically includes stack trace
+
+# Bad: Don't use print() for application logs
+print("Processing email...")  # ❌ Don't do this
+```
+
+### Logger Methods and Shortcuts
+
+The logger provides convenient shortcut methods:
+
+```python
+# Full method names
+LOG.debug("Debug message")
+LOG.info("Info message")
+LOG.warning("Warning message")
+LOG.exception("Error with traceback")
+
+# Shortcut methods (same as above)
+LOG.d("Debug message")
+LOG.i("Info message")
+LOG.w("Warning message")
+LOG.e("Error with traceback")
+```
+
+### Log Levels
+
+- **DEBUG** (`LOG.debug` / `LOG.d`): Detailed diagnostic information, typically only useful during development
+- **INFO** (`LOG.info` / `LOG.i`): General informational messages about application flow
+- **WARNING** (`LOG.warning` / `LOG.w`): Warnings about potentially problematic situations
+- **ERROR/EXCEPTION** (`LOG.exception` / `LOG.e`): Errors and exceptions with stack traces
+
+### Contextual Information
+
+The logging system automatically adds contextual information to each log:
+- **request_id**: For tracking HTTP requests (automatically added in Flask context)
+- **message_id**: For tracking email processing lifecycle (set via `set_message_id()`)
+- **process_id**: The process ID handling the request
+- **timestamp**: In UTC/GMT timezone
+- **source location**: File path, line number, and function name
+
+### Controlling Log Verbosity
+
+Use environment variables to control log levels:
+
+```bash
+# Local development (more verbose)
+LOG_LEVEL=DEBUG
+
+# Production (less verbose, default)
+LOG_LEVEL=INFO
+
+# Suppress library log spam (default: enabled)
+SILENCE_FLANKER_LOGS=1
+```
+
+### Testing with Logs
+
+When writing tests that involve logging:
+
+```python
+def test_something(caplog):
+    """Test that uses pytest's caplog fixture to capture logs."""
+    from app.log import LOG
+    
+    # Your test code that logs
+    LOG.info("Test message")
+    
+    # Verify log messages
+    assert "Test message" in caplog.text
+```
+
+### When to Use print()
+
+Reserve `print()` statements for:
+- Command-line scripts intended for user interaction (in `commands/` directory)
+- Configuration/startup messages that must appear before logging is initialized
+- Development debugging (but remove before committing)
+
+Do NOT use `print()` for:
+- Application logic logging
+- Error reporting
+- Debugging production issues
+
 ## Run tests
 
 For most tests, you will need to have ``redis`` installed and started on your machine (listening on port 6379).

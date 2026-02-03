@@ -553,6 +553,53 @@ Then restart the web app to apply: `docker restart sl-app`
 You don't have to pay anything to SimpleLogin to use all its features.
 If you like the project, you can make a donation on our Open Collective page at https://opencollective.com/simplelogin
 
+### Logging Configuration
+
+SimpleLogin uses centralized logging configured in `app/log.py`. All application code uses the `LOG` logger instance from this module.
+
+#### Log Level Control
+
+You can control the verbosity of logs using the `LOG_LEVEL` environment variable:
+
+```bash
+# Set log level (default: INFO)
+# Valid values: DEBUG, INFO, WARNING, ERROR, CRITICAL
+LOG_LEVEL=DEBUG
+
+# For production, INFO is recommended (default)
+LOG_LEVEL=INFO
+```
+
+- **DEBUG**: Most verbose, includes detailed diagnostic information
+- **INFO**: General informational messages (default for production)
+- **WARNING**: Warning messages for potentially problematic situations
+- **ERROR**: Error messages for serious problems
+- **CRITICAL**: Critical messages for very serious errors
+
+#### Suppressing Library Log Spam
+
+By default, SimpleLogin suppresses verbose logging from certain library dependencies (flanker, spf) that can create log spam. This is controlled by the `SILENCE_FLANKER_LOGS` environment variable:
+
+```bash
+# Suppress flanker/spf library logs (default: enabled)
+SILENCE_FLANKER_LOGS=1
+
+# To see all library logs for debugging
+SILENCE_FLANKER_LOGS=0
+```
+
+When enabled (default), library loggers are set to ERROR level, which means only serious errors from these libraries will be logged.
+
+#### Colored Logs
+
+For local development, you can enable colored log output:
+
+```bash
+COLOR_LOG=1
+```
+
+This makes logs easier to read in the terminal by color-coding different log levels.
+
 ### Misc
 
 The above self-hosting instructions correspond to a freshly Ubuntu server and doesn't cover all possible server configuration.

@@ -1,12 +1,22 @@
 import logging
+import os
 import sys
 import time
+import warnings
 
 import coloredlogs
 
 from app.config import (
     COLOR_LOG,
 )
+
+# Suppress SyntaxWarnings from dependencies
+warnings.filterwarnings("ignore", category=SyntaxWarning)
+
+# Determine log level from environment
+# Default to INFO for production, can override with LOG_LEVEL env var
+_DEFAULT_LOG_LEVEL = os.environ.get("LOG_LEVEL", "INFO").upper()
+_LOG_LEVEL = getattr(logging, _DEFAULT_LOG_LEVEL, logging.INFO)
 
 # this format allows clickable link to code source in PyCharm
 _log_format = (
@@ -63,7 +73,7 @@ def _get_console_handler():
 def _get_logger(name) -> logging.Logger:
     logger = logging.getLogger(name)
 
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(_LOG_LEVEL)
 
     # leave the handlers level at NOTSET so the level checking is only handled by the logger
     logger.addHandler(_get_console_handler())
@@ -75,12 +85,26 @@ def _get_logger(name) -> logging.Logger:
     logger.propagate = False
 
     if COLOR_LOG:
-        coloredlogs.install(level="DEBUG", logger=logger, fmt=_log_format)
+        coloredlogs.install(level=_LOG_LEVEL, logger=logger, fmt=_log_format)
 
     return logger
 
 
-print(">>> init logging <<<")
+# Suppress log spam from library dependencies
+# This must happen before any imports that use these libraries
+_SILENCE_FLANKER_LOGS = os.environ.get("SILENCE_FLANKER_LOGS", "1") == "1"
+if _SILENCE_FLANKER_LOGS:
+    # Set flanker logger to ERROR to suppress INFO/DEBUG/WARNING spam
+    flanker_logger = logging.getLogger("flanker")
+    flanker_logger.setLevel(logging.ERROR)
+    
+    # Set spf logger to ERROR to suppress INFO/DEBUG/WARNING spam
+    spf_logger = logging.getLogger("spf")
+    spf_logger.setLevel(logging.ERROR)
+
+
+# Replace print statement with logger for initialization message
+# Kept as comment for reference: print(">>> init logging <<<")
 
 # Disable flask logs such as 127.0.0.1 - - [15/Feb/2013 10:52:22] "GET /index.html HTTP/1.1" 200
 log = logging.getLogger("werkzeug")
