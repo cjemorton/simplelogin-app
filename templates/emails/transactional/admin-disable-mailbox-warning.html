@@ -15,11 +15,12 @@
   {% endcall %}
 
   {% if reason %}
+
     {% call text() %}
       <strong>Here's what we found:</strong> {{ reason }}
     {% endcall %}
-  {% endif %}
 
+  {% endif %}
   {% call text() %}
     To keep your account in good standing, please review your mailbox configuration.
     If we don't hear from you or see changes, we may need to disable this mailbox,

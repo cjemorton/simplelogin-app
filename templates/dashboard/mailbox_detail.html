@@ -107,7 +107,10 @@
                     <input type="hidden" name="form-name" value="toggle-pgp">
                     <label class="custom-switch cursor" style="padding-left: 1rem" data-toggle="tooltip" {% if mailbox.disable_pgp %}
                        title="Enable PGP" {% else %} title="Disable PGP" {% endif %}>
-                      <input type="checkbox" class="custom-switch-input" name="pgp-enabled" {{ "" if mailbox.disable_pgp else "checked" }}>
+                      <input type="checkbox"
+                             class="custom-switch-input"
+                             name="pgp-enabled"
+                             {{ "" if mailbox.disable_pgp else "checked" }}>
                       <span class="custom-switch-indicator"></span>
                     </label>
                   </form>
@@ -200,7 +203,10 @@
               </div>
               <label class="custom-switch cursor mt-2 pl-0" data-toggle="tooltip" {% if mailbox.force_spf %}
                  title="Disable SPF enforcement" {% else %} title="Enable SPF enforcement" {% endif %}>
-                <input type="checkbox" name="spf-status" class="custom-switch-input" {{ "checked" if mailbox.force_spf else "" }}>
+                <input type="checkbox"
+                       name="spf-status"
+                       class="custom-switch-input"
+                       {{ "checked" if mailbox.force_spf else "" }}>
                 <span class="custom-switch-indicator"></span>
               </label>
             </div>

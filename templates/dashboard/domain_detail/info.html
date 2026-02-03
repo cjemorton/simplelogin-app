@@ -14,7 +14,9 @@
       <input type="hidden" name="form-name" value="switch-catch-all">
       <label class="custom-switch cursor mt-2 pl-0" data-toggle="tooltip" {% if custom_domain.catch_all %}
          title="Disable catch-all" {% else %} title="Enable catch-all" {% endif %}>
-        <input type="checkbox" class="custom-switch-input" {{ "checked" if custom_domain.catch_all else "" }}>
+        <input type="checkbox"
+               class="custom-switch-input"
+               {{ "checked" if custom_domain.catch_all else "" }}>
         <span class="custom-switch-indicator"></span>
         <spam class="ml-2">
         Catch All
@@ -101,7 +103,9 @@
              value="switch-random-prefix-generation">
       <label class="custom-switch cursor mt-2 pl-0" data-toggle="tooltip" {% if custom_domain.random_prefix_generation %}
          title="Disable random prefix generation" {% else %} title="Enable random prefix generation" {% endif %}>
-        <input type="checkbox" class="custom-switch-input" {{ "checked" if custom_domain.random_prefix_generation else "" }}>
+        <input type="checkbox"
+               class="custom-switch-input"
+               {{ "checked" if custom_domain.random_prefix_generation else "" }}>
         <span class="custom-switch-indicator"></span>
       </label>
     </form>

@@ -95,10 +95,10 @@
         {% if query %}
           {% if highlight_contact_id %}
 
-            <a href="{{ url_for("dashboard.alias_contact_manager", alias_id=alias.id, highlight_contact_id=highlight_contact_id) }}"
+            <a href="{{ url_for('dashboard.alias_contact_manager', alias_id=alias.id, highlight_contact_id=highlight_contact_id) }}"
                class="btn btn-light">Reset</a>
           {% else %}
-            <a href="{{ url_for("dashboard.alias_contact_manager", alias_id=alias.id) }}"
+            <a href="{{ url_for('dashboard.alias_contact_manager', alias_id=alias.id) }}"
                class="btn btn-light">Reset</a>
           {% endif %}
         {% endif %}
@@ -124,7 +124,11 @@
             <div class="col text-right">
               <label class="custom-switch cursor" data-toggle="tooltip" {% if contact.block_forward %}
                  title="Unblock sender - start receiving emails from this sender" {% else %} title="Block sender - stop receiving emails from this sender" {% endif %} style="padding-left: 0px">
-                <input type="checkbox" class="enable-disable-contact custom-switch-input" data-contact="{{ contact.id }}" data-contact-email="{{ contact.website_email }}" {{ "checked" if not contact.block_forward else "" }}>
+                <input type="checkbox"
+                       class="enable-disable-contact custom-switch-input"
+                       data-contact="{{ contact.id }}"
+                       data-contact-email="{{ contact.website_email }}"
+                       {{ "checked" if not contact.block_forward else "" }}>
                 <span class="custom-switch-indicator"></span>
               </label>
             </div>

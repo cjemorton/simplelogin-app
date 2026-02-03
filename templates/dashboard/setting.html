@@ -35,7 +35,7 @@
             <div>
               {% if paddle_sub.cancelled %}(Cancelled){% endif %}
               {{ paddle_sub.plan_name() }} plan subscribed via Paddle.
-              <a href="{{ url_for("dashboard.billing") }}">Manage Subscription ➡</a>
+              <a href="{{ url_for('dashboard.billing') }}">Manage Subscription ➡</a>
             </div>
           {% endif %}
           {% if manual_sub and manual_sub.is_active() %}
@@ -48,7 +48,7 @@
                 <br />
                 To gain additional features and support SimpleLogin you can upgrade to a Premium plan.
                 <br />
-                <a href="{{ url_for("dashboard.pricing") }}"
+                <a href="{{ url_for('dashboard.pricing') }}"
                    class="btn btn-sm btn-outline-primary">Upgrade</a>
               {% endif %}
             </div>
@@ -61,7 +61,7 @@
               <div class="alert alert-info">
                 If you want to subscribe via the Web instead, please make sure to cancel your subscription
                 on Apple first.
-                <a href="{{ url_for("dashboard.pricing") }}">
+                <a href="{{ url_for('dashboard.pricing') }}">
                   Upgrade <i class="fa fa-arrow-right" aria-hidden="true"></i>
                 </a>
               </div>
@@ -72,7 +72,7 @@
             <div>
               Yearly plan subscribed with cryptocurrency which expires on
               {{ coinbase_sub.end_at.format("YYYY-MM-DD") }}.
-              <a href="{{ url_for("dashboard.coinbase_checkout_route") }}"
+              <a href="{{ url_for('dashboard.coinbase_checkout_route') }}"
                  target="_blank"
                  rel="noopener noreferrer">
                 Extend Subscription <i class="fe fe-external-link"></i>
@@ -210,7 +210,7 @@
 
               <div class="alert alert-info" role="alert">
                 This feature is only available on Premium plan.
-                <a href="{{ url_for("dashboard.pricing") }}"
+                <a href="{{ url_for('dashboard.pricing') }}"
                    target="_blank"
                    rel="noopener noreferrer">
                   Upgrade<i class="fe fe-external-link"></i>
@@ -433,7 +433,7 @@
                         <br />
                         This is an exceptional case where SimpleLogin temporarily stores the email.
                       </div>
-                      <a href="{{ url_for("dashboard.refused_email_route") }}"
+                      <a href="{{ url_for('dashboard.refused_email_route') }}"
                          class="btn btn-outline-primary">See quarantine & bounce emails</a>
                     </div>
                   </div>
@@ -488,13 +488,13 @@
                         <input type="hidden" name="form-name" value="alias-delete-action">
                         <select class="form-control mr-sm-2" name="alias-delete-action">
                           <option value="{{ UserAliasDeleteAction.MoveToTrash.value }}" {% if current_user.alias_delete_action.value == UserAliasDeleteAction.MoveToTrash.value %}
-                            selected="selected"{% endif %}>Move to Trash</option>
+                             selected="selected"{% endif %}>Move to Trash</option>
                           <option value="{{ UserAliasDeleteAction.DeleteImmediately.value }}" {% if current_user.alias_delete_action.value == UserAliasDeleteAction.DeleteImmediately.value %}
-                            selected="selected"{% endif %}>Delete immediately</option>
+                             selected="selected"{% endif %}>Delete immediately</option>
                         </select>
                         <button class="btn btn-outline-primary">Update</button>
                       </form>
-                      <a href="{{ url_for("dashboard.alias_trash") }}"
+                      <a href="{{ url_for('dashboard.alias_trash') }}"
                          class="btn btn-secondary">See alias trash</a>
                     </div>
                   </div>
@@ -531,9 +531,9 @@
                           You can import your aliases created on other platforms into SimpleLogin.
                           You can also export your aliases to a readable csv format for a future batch import.
                         </div>
-                        <a href="{{ url_for("dashboard.batch_import_route") }}"
+                        <a href="{{ url_for('dashboard.batch_import_route') }}"
                            class="btn btn-outline-primary">Batch Import</a>
-                        <a href="{{ url_for("dashboard.alias_export_route") }}"
+                        <a href="{{ url_for('dashboard.alias_export_route') }}"
                            class="btn btn-outline-secondary">Export Aliases</a>
                       </div>
                     </div>

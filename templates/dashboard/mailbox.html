@@ -84,6 +84,7 @@
                   <br />
                 </h6>
                 {% if not mailbox.is_admin_disabled() %}
+
                   <a href="{{ url_for('dashboard.mailbox_detail_route', mailbox_id=mailbox.id) }}">Edit
                   ➡</a>
                 {% endif %}

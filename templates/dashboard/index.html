@@ -220,7 +220,7 @@
         <div style="margin-left: auto">
           {% if query or sort or filter %}
 
-            <a href="{{ url_for("dashboard.index") }}"
+            <a href="{{ url_for('dashboard.index') }}"
                class="btn btn-outline-secondary">Reset</a>
           {% endif %}
         </div>
@@ -239,13 +239,7 @@
             <div class="col-8">
               <span class="{% if alias.id == highlight_alias_id %}
                  highlighted{% endif %} clipboard cursor mb-0" {% if loop.index ==1 %}
-                 data-intro="This is your first <em>alias</em>.
-                <br />
-                <br />
-                Emails sent to an alias are <em>forwarded</em> to your <em>real</em> email address.
-                <br />
-                <br />
-                " data-step="2"
+                 data-intro="This is your first <em>alias</em>. <br /> <br /> Emails sent to an alias are <em>forwarded</em> to your <em>real</em> email address. <br /> <br /> " data-step="2"
               {% endif %}
               {% if alias.enabled %}data-toggle="tooltip" title="Click to copy" data-clipboard-text="{{ alias.email }}"{% endif %}
               >
@@ -281,13 +275,14 @@
           <div class="col text-right">
             <label class="custom-switch cursor" data-toggle="tooltip" {% if alias.enabled %}
                title="Disable alias - stop receiving emails sent to this alias" {% else %} title="Enable alias - start receiving emails sent to this alias" {% endif %}  {% if loop.index ==1 %}
-               data-intro="By <em>disabling</em> an alias, emails sent to this alias will <em>not</em> be forwarded to your inbox.
-              <br />
-              <br />
-              " data-step="3"
+               data-intro="By <em>disabling</em> an alias, emails sent to this alias will <em>not</em> be forwarded to your inbox. <br /> <br /> " data-step="3"
             {% endif %}
             style="padding-left: 0px">
-            <input type="checkbox" class="enable-disable-alias custom-switch-input" data-alias="{{ alias.id }}" data-alias-email="{{ alias.email }}" {{ "checked" if alias.enabled else "" }}>
+            <input type="checkbox"
+                   class="enable-disable-alias custom-switch-input"
+                   data-alias="{{ alias.id }}"
+                   data-alias-email="{{ alias.email }}"
+                   {{ "checked" if alias.enabled else "" }}>
             <span class="custom-switch-indicator"></span>
           </label>
         </div>
@@ -357,16 +352,13 @@
       <div class="row">
         <div class="col">
           <a href="{{ url_for('dashboard.alias_contact_manager', alias_id=alias.id) }}" id="send-email-{{ alias.id }}" {% if loop.index ==1 %}
-             data-intro="Not only can an alias receive emails, it can <em>send</em> emails too!
-            <br />
-            <br />
-            You can add a new <em>contact</em> for your alias here.
-            <br />
-            <br />
-            If you need to reply to an email, just hit 'Reply': the response will come from your alias and your real email address stays <em>hidden</em>." data-step="4"
+             data-intro="Not only can an alias receive emails, it can <em>send</em> emails too! <br /> <br /> You can add a new <em>contact</em> for your alias here. <br /> <br /> If you need to reply to an email, just hit 'Reply': the response will come from your alias and your real email address stays <em>hidden</em>." data-step="4"
           {% endif %}
           class="btn btn-sm btn-outline-primary
-          {% if not alias.enabled %}disabled{% endif %}
+          {% if not alias.enabled %}
+
+            disabled
+          {% endif %}
           " data-toggle="tooltip" title="Add new contact, manage your existing contacts">
           Contacts&nbsp; &nbsp;<i class="fe fe-send"></i>
         </a>
@@ -405,7 +397,9 @@
          class="btn btn-sm btn-link">See All &nbsp;→</a>
       {% set has_admin_disabled_mailbox = namespace(value=false) %}
       {% for mb in alias_info.mailboxes %}
+
         {% if mb.is_admin_disabled() %}
+
           {% set has_admin_disabled_mailbox.value = true %}
         {% endif %}
       {% endfor %}
@@ -468,7 +462,11 @@
         </div>
         <div>
           <label class="custom-switch cursor pl-0">
-            <input type="checkbox" class="enable-disable-pgp custom-switch-input" data-alias="{{ alias.id }}" data-alias-email="{{ alias.email }}" {{ "checked" if alias.pgp_enabled() else "" }}>
+            <input type="checkbox"
+                   class="enable-disable-pgp custom-switch-input"
+                   data-alias="{{ alias.id }}"
+                   data-alias-email="{{ alias.email }}"
+                   {{ "checked" if alias.pgp_enabled() else "" }}>
             <span class="custom-switch-indicator"></span>
           </label>
         </div>
@@ -481,7 +479,11 @@
       </div>
       <div>
         <label class="custom-switch cursor pl-0">
-          <input type="checkbox" class="pin-alias custom-switch-input" data-alias="{{ alias.id }}" data-alias-email="{{ alias.email }}" {{ "checked" if alias.pinned else "" }}>
+          <input type="checkbox"
+                 class="pin-alias custom-switch-input"
+                 data-alias="{{ alias.id }}"
+                 data-alias-email="{{ alias.email }}"
+                 {{ "checked" if alias.pinned else "" }}>
           <span class="custom-switch-indicator"></span>
         </label>
       </div>

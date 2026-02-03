@@ -17,7 +17,10 @@
   {% endif %}
 {%- endmacro %}
 {% macro copy_btn(text) -%}
-  <button type="button" class="btn btn-sm btn-link p-0 ml-1 copy-btn" data-copy="{{ text }}" title="Copy to clipboard">
+  <button type="button"
+          class="btn btn-sm btn-link p-0 ml-1 copy-btn"
+          data-copy="{{ text }}"
+          title="Copy to clipboard">
     <i class="fa fa-copy text-muted"></i>
   </button>
 {%- endmacro %}
@@ -1346,6 +1349,7 @@
                   </li>
                 {% endif %}
                 {% for p in range(1, total_pages + 1) %}
+
                   {% if p == current_page %}
 
                     <li class="page-item active">
@@ -2526,15 +2530,24 @@
               <div class="input-group-prepend">
                 <div class="btn-group btn-group-toggle" data-toggle="buttons">
                   <label class="btn btn-outline-primary {{ 'active' if search_type == 'email' else '' }}">
-                    <input type="radio" name="search_type" value="email" {{ 'checked' if search_type == 'email' else '' }}>
+                    <input type="radio"
+                           name="search_type"
+                           value="email"
+                           {{ 'checked' if search_type == 'email' else '' }}>
                     <i class="fa fa-envelope mr-1"></i>Email
                   </label>
                   <label class="btn btn-outline-primary {{ 'active' if search_type == 'alias' else '' }}">
-                    <input type="radio" name="search_type" value="alias" {{ 'checked' if search_type == 'alias' else '' }}>
+                    <input type="radio"
+                           name="search_type"
+                           value="alias"
+                           {{ 'checked' if search_type == 'alias' else '' }}>
                     <i class="fa fa-at mr-1"></i>Alias
                   </label>
                   <label class="btn btn-outline-primary {{ 'active' if search_type == 'partner' else '' }}">
-                    <input type="radio" name="search_type" value="partner" {{ 'checked' if search_type == 'partner' else '' }}>
+                    <input type="radio"
+                           name="search_type"
+                           value="partner"
+                           {{ 'checked' if search_type == 'partner' else '' }}>
                     <i class="fa fa-handshake mr-1"></i>Partner
                   </label>
                 </div>

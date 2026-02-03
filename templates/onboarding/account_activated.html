@@ -5,7 +5,7 @@
   <div class="flex-fill align-items-center mt-8">
     <!-- Image container -->
     <div class="mt-4 mb-4 text-center" style="display:block;">
-      <a href="{{ url_for("dashboard.index") }}">
+      <a href="{{ url_for('dashboard.index') }}">
         <picture>
           <source media="(max-width: 650px)" srcset="/static/logo.svg">
           <img src="/static/logo.svg" style="width: 12rem" alt="logo">
@@ -36,7 +36,7 @@
                   border:1px solid black;
                   display:block;
                   width:50%"
-           href="{{ url_for("dashboard.index") }}">Continue to our web app</a>
+           href="{{ url_for('dashboard.index') }}">Continue to our web app</a>
       </div>
     </div>
   </div>
