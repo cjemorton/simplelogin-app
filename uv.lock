@@ -465,12 +465,12 @@ wheels = [
 
 [[package]]
 name = "dkimpy"
-version = "1.0.5"
+version = "1.1.8"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dnspython" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/b5/33/9c60f3a34d4d7237e5c21eb73e06a34f52c3a959fa20efb705e5b0b16d01/dkimpy-1.0.5.tar.gz", hash = "sha256:9a2420bf09af686736773153fca32a02ae11ecbe24b540c26104628959f91121", size = 59799, upload-time = "2020-08-09T02:51:36.461Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f0/6f/84e91828186bbfcedd7f9385ef5e0d369632444195c20e08951b7ffe0481/dkimpy-1.1.8.tar.gz", hash = "sha256:b5f60fb47bbf5d8d762f134bcea0c388eba6b498342a682a21f1686545094b77", size = 66979, upload-time = "2024-07-04T22:16:38.321Z" }
 
 [[package]]
 name = "dnspython"
@@ -492,15 +492,15 @@ wheels = [
 
 [[package]]
 name = "email-validator"
-version = "2.2.0"
+version = "2.3.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "dnspython" },
     { name = "idna" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/48/ce/13508a1ec3f8bb981ae4ca79ea40384becc868bfae97fd1c942bb3a001b1/email_validator-2.2.0.tar.gz", hash = "sha256:cb690f344c617a714f22e66ae771445a1ceb46821152df8e165c5f9a364582b7", size = 48967, upload-time = "2024-06-20T11:30:30.034Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f5/22/900cb125c76b7aaa450ce02fd727f452243f2e91a61af068b40adba60ea9/email_validator-2.3.0.tar.gz", hash = "sha256:9fc05c37f2f6cf439ff414f8fc46d917929974a82244c20eb10231ba60c54426", size = 51238, upload-time = "2025-08-26T13:09:06.831Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d7/ee/bf0adb559ad3c786f12bcbc9296b3f5675f529199bef03e2df281fa1fadb/email_validator-2.2.0-py3-none-any.whl", hash = "sha256:561977c2d73ce3611850a06fa56b414621e0c8faa9d66f2611407d87465da631", size = 33521, upload-time = "2024-06-20T11:30:28.248Z" },
+    { url = "https://files.pythonhosted.org/packages/de/15/545e2b6cf2e3be84bc1ed85613edd75b8aea69807a71c26f4ca6a9258e82/email_validator-2.3.0-py3-none-any.whl", hash = "sha256:80f13f623413e6b197ae73bb10bf4eb0908faf509ad8362c5edeb0be7fd450b4", size = 35604, upload-time = "2025-08-26T13:09:05.858Z" },
 ]
 
 [[package]]
@@ -1852,9 +1852,9 @@ requires-dist = [
     { name = "coloredlogs", specifier = "~=14.0" },
     { name = "cryptography", specifier = "~=37.0.1" },
     { name = "deprecated", specifier = "~=1.2.13" },
-    { name = "dkimpy", specifier = "==1.0.5" },
+    { name = "dkimpy", specifier = "~=1.1.8" },
     { name = "dnspython", specifier = "~=2.7.0" },
-    { name = "email-validator", specifier = "~=2.2.0" },
+    { name = "email-validator", specifier = "~=2.3.0" },
     { name = "facebook-sdk", specifier = "~=3.1.0" },
     { name = "flanker", git = "https://github.com/mailgun/flanker.git?rev=v0.9.15" },
     { name = "flask", specifier = "~=1.1.2" },
@@ -1898,7 +1898,7 @@ requires-dist = [
     { name = "sqlalchemy-utils", specifier = "==0.36.8" },
     { name = "sqlalchemy-utils", specifier = "~=0.36.8" },
     { name = "strictyaml", specifier = "~=1.7.3" },
-    { name = "tldextract", specifier = "~=3.1.2" },
+    { name = "tldextract", specifier = "~=5.3.1" },
     { name = "twilio", specifier = "~=7.3.2" },
     { name = "unidecode", specifier = "~=1.1.1" },
     { name = "watchtower", specifier = "~=0.8.0" },
@@ -1990,7 +1990,7 @@ wheels = [
 
 [[package]]
 name = "tldextract"
-version = "3.1.2"
+version = "5.3.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "filelock" },
@@ -1998,9 +1998,9 @@ dependencies = [
     { name = "requests" },
     { name = "requests-file" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/6c/aa/ddf3d8f064887d5b4ae2c0ba7c688baa6cb48717db001abd340b72350069/tldextract-3.1.2.tar.gz", hash = "sha256:d2034c3558651f7d8fdadea83fb681050b2d662dc67a00d950326dc902029444", size = 103248, upload-time = "2021-09-01T16:30:02.105Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/65/7b/644fbbb49564a6cb124a8582013315a41148dba2f72209bba14a84242bf0/tldextract-5.3.1.tar.gz", hash = "sha256:a72756ca170b2510315076383ea2993478f7da6f897eef1f4a5400735d5057fb", size = 126105, upload-time = "2025-12-28T23:58:05.532Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c5/1e/58ad28cd1c6be6d37ec86b3f4790770f1cc49050d479fe773573a4704bc0/tldextract-3.1.2-py2.py3-none-any.whl", hash = "sha256:f55e05f6bf4cc952a87d13594386d32ad2dd265630a8bdfc3df03bd60425c6b0", size = 87096, upload-time = "2021-09-01T16:29:59.98Z" },
+    { url = "https://files.pythonhosted.org/packages/6d/42/0e49d6d0aac449ca71952ec5bae764af009754fcb2e76a5cc097543747b3/tldextract-5.3.1-py3-none-any.whl", hash = "sha256:6bfe36d518de569c572062b788e16a659ccaceffc486d243af0484e8ecf432d9", size = 105886, upload-time = "2025-12-28T23:58:04.071Z" },
 ]
 
 [[package]]
