@@ -191,8 +191,8 @@ deprecated==1.2.13 \
     # via
     #   limits
     #   simplelogin
-dkimpy==1.0.5 \
-    --hash=sha256:9a2420bf09af686736773153fca32a02ae11ecbe24b540c26104628959f91121
+dkimpy==1.1.8 \
+    --hash=sha256:b5f60fb47bbf5d8d762f134bcea0c388eba6b498342a682a21f1686545094b77
     # via simplelogin
 dnspython==2.7.0 \
     --hash=sha256:b4c34b7d10b51bcc3a5071e7b8dee77939f1e878477eeecc965e9835f63c6c86 \
@@ -201,9 +201,9 @@ dnspython==2.7.0 \
     #   dkimpy
     #   email-validator
     #   simplelogin
-email-validator==2.2.0 \
-    --hash=sha256:561977c2d73ce3611850a06fa56b414621e0c8faa9d66f2611407d87465da631 \
-    --hash=sha256:cb690f344c617a714f22e66ae771445a1ceb46821152df8e165c5f9a364582b7
+email-validator==2.3.0 \
+    --hash=sha256:80f13f623413e6b197ae73bb10bf4eb0908faf509ad8362c5edeb0be7fd450b4 \
+    --hash=sha256:9fc05c37f2f6cf439ff414f8fc46d917929974a82244c20eb10231ba60c54426
     # via simplelogin
 facebook-sdk==3.1.0 \
     --hash=sha256:2e987b3e0f466a6f4ee77b935eb023dba1384134f004a2af21f1cfff7fe0806e \
@@ -737,9 +737,9 @@ tld==0.12.6 \
     --hash=sha256:a92ac6b84917e7d9e934434b8d37e9be534598f138fbb86b3c0d5426f2621890 \
     --hash=sha256:b6650f2d5392a49760064bc55d73ce3397a378ef24ded96efb516c6b8ec68c26
     # via flanker
-tldextract==3.1.2 \
-    --hash=sha256:d2034c3558651f7d8fdadea83fb681050b2d662dc67a00d950326dc902029444 \
-    --hash=sha256:f55e05f6bf4cc952a87d13594386d32ad2dd265630a8bdfc3df03bd60425c6b0
+tldextract==5.3.1 \
+    --hash=sha256:6bfe36d518de569c572062b788e16a659ccaceffc486d243af0484e8ecf432d9 \
+    --hash=sha256:a72756ca170b2510315076383ea2993478f7da6f897eef1f4a5400735d5057fb
     # via simplelogin
 traitlets==5.0.4 \
     --hash=sha256:86c9351f94f95de9db8a04ad8e892da299a088a64fd283f9f6f18770ae5eae1b \
