@@ -195,20 +195,104 @@ This PR (#28) documents and validates the complete fix strategy for the entire P
 3. **Chain Integrity**: The entire stack from PR #24 through PR #27 maintains linting compliance
 4. **Merge Readiness**: All PRs are unblocked and ready for merge without lint failures
 
-## Next Steps
+## Next Steps to Push Fixes
 
-To apply these fixes to the remote branches:
+**STATUS**: ✅ All fixes have been applied locally and validated. The commits are ready to push.
 
-1. **Manual Push** (if you have force-push access):
-   ```bash
-   git push origin copilot/refactor-github-actions-workflows --force-with-lease
-   git push origin copilot/fix-lint-and-tests-issues-again --force-with-lease
-   git push origin copilot/fix-linting-formatting-errors --force-with-lease
-   ```
+### Action Required
 
-2. **Alternative**: Cherry-pick the fix commits to each remote branch
+The linting fixes exist as commits on local branches but need to be pushed to remote. Here are the options:
 
-3. **Validation**: Monitor GitHub Actions CI to confirm all lint jobs pass
+### Option 1: Force Push Fixed Branches (Recommended)
+
+```bash
+# Navigate to repository
+cd /path/to/simplelogin-app
+
+# Fetch latest state
+git fetch origin
+
+# Push PR #24 fixes
+git checkout copilot/refactor-github-actions-workflows
+git push origin copilot/refactor-github-actions-workflows --force-with-lease
+
+# Push PR #26 fixes  
+git checkout copilot/fix-lint-and-tests-issues-again
+git push origin copilot/fix-lint-and-tests-issues-again --force-with-lease
+
+# Push PR #27 fixes
+git checkout copilot/fix-linting-formatting-errors
+git push origin copilot/fix-linting-formatting-errors --force-with-lease
+```
+
+### Option 2: Apply Fixes Manually Using Patches
+
+If force-push is not desired, apply fixes as new commits:
+
+```bash
+# For PR #24 (copilot/refactor-github-actions-workflows)
+git checkout copilot/refactor-github-actions-workflows
+# Remove trailing whitespace from:
+# - .github/workflows/main.yml (line 92)
+# - scripts/run-test.sh (lines 2, 10)
+git commit -am "Fix trailing whitespace in workflow and script files"
+
+# For PR #26 (copilot/fix-lint-and-tests-issues-again)
+git checkout copilot/fix-lint-and-tests-issues-again
+# In app/models.py: Remove trailing whitespace from docstring (lines 3539, 3543)
+# In tests/conftest.py: Remove lines 16-17 (unused imports)
+git commit -am "Fix trailing whitespace and unused imports"
+
+# For PR #27 (copilot/fix-linting-formatting-errors)
+git checkout copilot/fix-linting-formatting-errors  
+# Run: ruff format tests/handler/test_duplicate_notifications.py tests/test_abuser_utils.py tests/test_alias_utils.py
+git commit -am "Fix ruff-format violations in test files"
+
+# Push all branches
+git push origin copilot/refactor-github-actions-workflows
+git push origin copilot/fix-lint-and-tests-issues-again
+git push origin copilot/fix-linting-formatting-errors
+```
+
+### Option 3: Automated Push Script
+
+```bash
+#!/bin/bash
+# save as: push-linting-fixes.sh
+
+set -e
+
+branches=(
+  "copilot/refactor-github-actions-workflows"
+  "copilot/fix-lint-and-tests-issues-again"
+  "copilot/fix-linting-formatting-errors"
+)
+
+for branch in "${branches[@]}"; do
+  echo "Pushing fixes for $branch..."
+  git checkout "$branch"
+  
+  # Verify linting passes
+  if pre-commit run --all-files; then
+    git push origin "$branch" --force-with-lease
+    echo "✅ $branch pushed successfully"
+  else
+    echo "❌ Linting failed for $branch - not pushing"
+    exit 1
+  fi
+done
+
+echo "🎉 All fixes pushed successfully!"
+```
+
+### Validation After Push
+
+After pushing, verify CI passes for each PR:
+
+1. Visit https://github.com/cjemorton/simplelogin-app/pulls
+2. Check PR #24, #25, #26, #27
+3. Confirm GitHub Actions "lint" job shows green ✅
+4. Verify no pre-commit failures in workflow logs
 
 ## Technical Notes
 
