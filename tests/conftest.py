@@ -13,9 +13,6 @@ import sqlalchemy
 from app.db import Session, engine, connection
 from app.rate_limiter import set_rate_limit_enabled
 
-from psycopg2 import errors
-from psycopg2.errorcodes import DEPENDENT_OBJECTS_STILL_EXIST
-
 import pytest
 
 from server import create_app
@@ -32,12 +29,11 @@ app.config["SERVER_NAME"] = "sl.lan"
 # enable pg_trgm extension
 with engine.connect() as conn:
     try:
-        conn.execute("DROP EXTENSION IF EXISTS pg_trgm CASCADE")
-        conn.execute("CREATE EXTENSION pg_trgm")
-    except sqlalchemy.exc.InternalError as e:
-        if isinstance(e.orig, errors.lookup(DEPENDENT_OBJECTS_STILL_EXIST)):
-            print(">>> pg_trgm can't be dropped, ignore")
-        conn.execute("Rollback")
+        conn.execute(sqlalchemy.text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
+        conn.commit()
+    except Exception as e:
+        print(f">>> Error creating pg_trgm extension: {e}")
+        conn.rollback()
 
 add_sl_domains()
 add_proton_partner()
