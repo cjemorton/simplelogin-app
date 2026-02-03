@@ -45,13 +45,19 @@ def clear_daily_metric_table():
     This prevents duplicate key violations on the daily_metric_date_key constraint
     when tests run in parallel (e.g., with pytest-xdist). The table is cleared once
     at the start of the test session to ensure a clean state.
+    
+    Uses engine.begin() to ensure atomic operation with automatic rollback on failure.
     """
-    with engine.connect() as conn:
-        try:
+    try:
+        with engine.begin() as conn:
             conn.execute(sqlalchemy.text("DELETE FROM daily_metric"))
-            conn.commit()
-        except sqlalchemy.exc.SQLAlchemyError as e:
-            print(f">>> Warning: Could not clear daily_metric table: {e}")
+    except sqlalchemy.exc.SQLAlchemyError as e:
+        import warnings
+        warnings.warn(
+            f"Could not clear daily_metric table: {e}. "
+            "This may cause duplicate key errors in parallel tests.",
+            stacklevel=2
+        )
 
 
 @pytest.fixture
