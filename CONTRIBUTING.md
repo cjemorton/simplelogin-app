@@ -79,10 +79,11 @@ All GitHub Actions workflows must implement the following optimizations:
          shard: [1, 2, 3, 4]
      ```
 
-2. **Test Partitioning with pytest-xdist**
-   - All test jobs must use pytest-xdist for sharding across matrix runners
-   - Use `--shard-id` and `--num-shards` flags to distribute tests deterministically
-   - Use `-n auto` within each shard for additional CPU-level parallelization
+2. **Test Partitioning with pytest-shard and pytest-xdist**
+   - All test jobs must use pytest-shard for sharding across matrix runners
+   - Use pytest-xdist for additional parallelization within each shard
+   - Use `--shard-id` and `--num-shards` flags (from pytest-shard) to distribute tests deterministically
+   - Use `-n auto` (from pytest-xdist) within each shard for additional CPU-level parallelization
    - Example:
      ```bash
      pytest --shard-id=${{ matrix.shard }} --num-shards=4 -n auto
@@ -141,7 +142,8 @@ All GitHub Actions workflows must implement the following optimizations:
 All test suites must be structured for parallelization:
 
 1. **Parallelization Support**
-   - Tests must be compatible with pytest-xdist
+   - Tests must be compatible with pytest-xdist (for parallel execution)
+   - Tests must work with pytest-shard (for deterministic test distribution)
    - Avoid shared state between tests (use fixtures for isolation)
    - Each test should be independently runnable
 
@@ -187,7 +189,7 @@ uv run pytest tests/api/test_specific.py::test_function_name -v
 Before submitting a PR:
 
 - [ ] All new workflows implement parallelization, caching, fail-fast, and path filters
-- [ ] New tests are compatible with pytest-xdist (no shared state issues)
+- [ ] New tests are compatible with pytest-xdist and pytest-shard (no shared state issues)
 - [ ] Integration tests use appropriate mocking or document why real services are needed
 - [ ] No new slow or non-deterministic tests without justification
 - [ ] All optimization choices are documented with inline comments

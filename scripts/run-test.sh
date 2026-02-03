@@ -1,5 +1,9 @@
 # Run tests locally or in CI
 # 
+# PREREQUISITES:
+# Make sure pytest-xdist and pytest-shard are installed for parallelization:
+#   uv pip install pytest-xdist pytest-shard
+#
 # LOCAL DEVELOPMENT:
 # For faster local testing, use pytest-xdist to run tests in parallel:
 #   uv run pytest -n auto
@@ -10,7 +14,8 @@
 # CI ENVIRONMENT:
 # In CI, tests are automatically split into 4 shards via GitHub Actions matrix
 # Each shard runs: pytest -c pytest.ci.ini --shard-id=X --num-shards=4 -n auto
-# The -n auto flag uses all available CPU cores within each shard
+# - pytest-shard distributes tests across shards (--shard-id, --num-shards)
+# - pytest-xdist parallelizes within each shard (-n auto uses all CPU cores)
 
 # Delete the test DB if it isn't properly removed
 docker rm -f sl-test-db

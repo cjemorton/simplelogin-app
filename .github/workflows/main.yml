@@ -166,11 +166,12 @@ jobs:
       - name: Install dependencies
         run: uv sync --locked --all-extras
 
-      # Install pytest-xdist for test parallelization and sharding
-      # pytest-xdist provides the --shard-id and --num-shards options
-      # used to distribute tests across matrix shards
-      - name: Install pytest-xdist
-        run: uv pip install pytest-xdist
+      # Install pytest-xdist and pytest-shard for test parallelization and sharding
+      # pytest-xdist: Enables parallel test execution within each shard using -n auto
+      # pytest-shard: Provides --shard-id and --num-shards for distributing tests across matrix runners
+      - name: Install pytest plugins for parallelization
+        run: |
+          uv pip install pytest-xdist pytest-shard
 
       # Redis v6: Real Redis instance for caching/session tests
       # Each matrix shard gets its own Redis to prevent test interference
@@ -190,10 +191,11 @@ jobs:
           scripts/generate-build-info.sh ${{ github.sha }} ${{ github.ref_name }}
           cat app/build_info.py
 
-      # Run tests with pytest-xdist sharding
-      # --shard-id and --num-shards distribute tests across matrix runners
-      # This is deterministic: same tests always run on same shard
-      # -n auto uses all available CPU cores within each shard for additional speedup
+      # Run tests with pytest-xdist and pytest-shard
+      # pytest-shard: --shard-id and --num-shards distribute tests across matrix runners
+      #   Each shard gets a deterministic subset of tests (same tests on same shard every time)
+      # pytest-xdist: -n auto uses all available CPU cores within each shard for additional speedup
+      #   This provides two levels of parallelization: across shards (matrix) and within shards (xdist)
       - name: Test with pytest (shard ${{ matrix.shard }}/4)
         run: |
           uv run pytest -c pytest.ci.ini --shard-id=${{ matrix.shard }} --num-shards=4 -n auto
