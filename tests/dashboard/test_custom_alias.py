@@ -2,6 +2,7 @@ from random import random
 
 from flask import url_for
 
+import arrow
 from app import config
 from app.alias_delete import delete_alias
 from app.alias_suffix import (
@@ -61,6 +62,13 @@ def test_add_alias_success(flask_client):
 
 def test_add_alias_increment_nb_daily_metric_alias(flask_client):
     user = login(flask_client)
+
+    # Clear any existing daily metric for today to avoid unique constraint violations
+    today = arrow.utcnow().date()
+    existing_metric = DailyMetric.get_by(date=today)
+    if existing_metric:
+        Session.delete(existing_metric)
+        Session.commit()
 
     daily_metric = DailyMetric.get_or_create_today_metric()
     Session.commit()

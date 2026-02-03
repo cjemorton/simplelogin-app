@@ -32,7 +32,7 @@ app.config["SERVER_NAME"] = "sl.lan"
 # enable pg_trgm extension
 with engine.connect() as conn:
     try:
-        conn.execute("DROP EXTENSION if exists pg_trgm")
+        conn.execute("DROP EXTENSION IF EXISTS pg_trgm CASCADE")
         conn.execute("CREATE EXTENSION pg_trgm")
     except sqlalchemy.exc.InternalError as e:
         if isinstance(e.orig, errors.lookup(DEPENDENT_OBJECTS_STILL_EXIST)):

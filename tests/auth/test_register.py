@@ -1,5 +1,6 @@
 from flask import url_for
 
+import arrow
 from app import config
 from app.db import Session
 from app.models import DailyMetric, User
@@ -29,6 +30,13 @@ def test_register_success(flask_client):
 
 
 def test_register_increment_nb_new_web_non_proton_user(flask_client):
+    # Clear any existing daily metric for today to avoid unique constraint violations
+    today = arrow.utcnow().date()
+    existing_metric = DailyMetric.get_by(date=today)
+    if existing_metric:
+        Session.delete(existing_metric)
+        Session.commit()
+    
     daily_metric = DailyMetric.get_or_create_today_metric()
     Session.commit()
     nb_new_web_non_proton_user = daily_metric.nb_new_web_non_proton_user
