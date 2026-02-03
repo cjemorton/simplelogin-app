@@ -2,7 +2,6 @@ from random import random
 
 from flask import url_for
 
-import arrow
 from app import config
 from app.alias_delete import delete_alias
 from app.alias_suffix import (
@@ -63,7 +62,7 @@ def test_add_alias_success(flask_client):
 
 def test_add_alias_increment_nb_daily_metric_alias(flask_client, monkeypatch):
     """Test that alias creation increments the daily metric counter.
-    
+
     This test uses a unique date to avoid unique constraint violations when tests
     run in parallel (e.g., with pytest-xdist across multiple shards).
     """
@@ -71,21 +70,23 @@ def test_add_alias_increment_nb_daily_metric_alias(flask_client, monkeypatch):
 
     # Generate a unique test date to avoid conflicts with other parallel tests
     test_date = get_unique_date()
-    
+
     # Mock arrow.utcnow() to return our test date
     class MockArrow:
         @staticmethod
         def date():
             return test_date
-    
+
     def mock_utcnow():
         return MockArrow()
-    
+
     # Patch arrow.utcnow in the models module where get_or_create_today_metric is defined
     monkeypatch.setattr("app.models.arrow.utcnow", mock_utcnow)
 
     # Create the daily metric for our test date
-    daily_metric = DailyMetric.create(date=test_date, nb_new_web_non_proton_user=0, nb_alias=0)
+    daily_metric = DailyMetric.create(
+        date=test_date, nb_new_web_non_proton_user=0, nb_alias=0
+    )
     Session.commit()
     nb_alias = daily_metric.nb_alias
 

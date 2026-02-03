@@ -113,12 +113,12 @@ def fix_rate_limit_after_request():
 def get_unique_date() -> date:
     """
     Generate a unique date for test purposes.
-    
+
     This function generates unique dates by combining a base date with an incrementing counter
     and a random offset. This ensures that tests running in parallel (e.g., with pytest-xdist)
     won't create database entries with duplicate dates, avoiding unique constraint violations
     on the daily_metric table.
-    
+
     Returns:
         date: A unique date object safe to use in parallel test execution
     """
