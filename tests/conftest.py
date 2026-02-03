@@ -30,10 +30,8 @@ app.config["SERVER_NAME"] = "sl.lan"
 with engine.connect() as conn:
     try:
         conn.execute("CREATE EXTENSION IF NOT EXISTS pg_trgm")
-        conn.commit()
     except sqlalchemy.exc.SQLAlchemyError as e:
         print(f">>> Error creating pg_trgm extension: {e}")
-        conn.rollback()
 
 add_sl_domains()
 add_proton_partner()
