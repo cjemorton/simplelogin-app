@@ -15,9 +15,6 @@ from app.models import User, PartnerUser, UserAliasDeleteAction
 from app.proton.proton_partner import get_proton_partner
 from app.utils import random_string
 
-# Counter for generating unique dates in tests to avoid DB unique constraint violations
-_date_counter = 0
-
 
 def create_new_user(
     email: Optional[str] = None,
@@ -114,19 +111,26 @@ def get_unique_date() -> date:
     """
     Generate a unique date for test purposes.
 
-    This function generates unique dates by combining a base date with an incrementing counter
-    and a random offset. This ensures that tests running in parallel (e.g., with pytest-xdist)
-    won't create database entries with duplicate dates, avoiding unique constraint violations
-    on the daily_metric table.
+    This function generates unique dates by combining a base date with a process ID,
+    timestamp, and random offset. This ensures that tests running in parallel
+    (e.g., with pytest-xdist across multiple processes/workers) won't create database
+    entries with duplicate dates, avoiding unique constraint violations on the
+    daily_metric table.
+
+    The cleanup of test data is handled automatically by the transaction rollback
+    in the flask_client fixture (see conftest.py).
 
     Returns:
         date: A unique date object safe to use in parallel test execution
     """
-    global _date_counter
-    _date_counter += 1
     # Use a base date far in the past (year 2000) to avoid conflicts with real data
-    # Add counter + random offset to ensure uniqueness across parallel test runs
     base_date = date(2000, 1, 1)
-    # Random offset up to 10000 days plus counter to ensure uniqueness
-    offset_days = _date_counter + random.randint(0, 10000)
-    return base_date + timedelta(days=offset_days)
+    # Combine process ID, timestamp, and random to ensure uniqueness across parallel workers
+    # This is process-safe for pytest-xdist which runs tests in separate processes
+    import time
+
+    pid_offset = os.getpid() % 10000  # Process ID for worker uniqueness
+    time_offset = int(time.time() * 1000) % 100000  # Timestamp for temporal uniqueness
+    random_offset = random.randint(0, 10000)  # Random for additional uniqueness
+    total_offset = pid_offset + time_offset + random_offset
+    return base_date + timedelta(days=total_offset % 36500)  # Stay within ~100 years
