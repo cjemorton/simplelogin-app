@@ -18,7 +18,7 @@ FROM ubuntu:24.04 AS development
 
 # Build arguments
 ARG UV_VERSION="0.8.18"
-ARG UV_HASH="e7e78475c6d6cfeac5cb96b01ac50e22df5af97dc1e0d5a5e75ce682b3e4a54b"
+ARG UV_HASH="59ad1a1809fa47019b86cf339fff161cb7b00ad3d8d42354eea57d0d91aeb44c"
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \

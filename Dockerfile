@@ -18,7 +18,7 @@ FROM ubuntu:24.04 AS python-builder
 
 # Build arguments
 ARG UV_VERSION="0.8.18"
-ARG UV_HASH="e7e78475c6d6cfeac5cb96b01ac50e22df5af97dc1e0d5a5e75ce682b3e4a54b"
+ARG UV_HASH="59ad1a1809fa47019b86cf339fff161cb7b00ad3d8d42354eea57d0d91aeb44c"
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1 \
@@ -84,7 +84,7 @@ WORKDIR /code
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
         ca-certificates \
-        libre2-11 \
+        libre2-10 \
         libpq5 \
         postgresql-client \
         bash \
@@ -92,8 +92,9 @@ RUN apt-get update && \
     && rm -rf /var/lib/apt/lists/*
 
 # Create non-root user for security
-RUN groupadd -g 1000 simplelogin && \
-    useradd -r -u 1000 -g simplelogin -s /bin/bash simplelogin
+# Note: Ubuntu 24.04 may have UID/GID 1000 reserved, so we check first
+RUN (groupadd -g 1000 simplelogin 2>/dev/null || groupmod -n simplelogin $(getent group 1000 | cut -d: -f1)) && \
+    (useradd -r -u 1000 -g simplelogin -s /bin/bash simplelogin 2>/dev/null || usermod -l simplelogin -d /code -s /bin/bash $(getent passwd 1000 | cut -d: -f1))
 
 # Copy Python environment from builder
 COPY --from=python-builder --chown=simplelogin:simplelogin /code/.venv /code/.venv
