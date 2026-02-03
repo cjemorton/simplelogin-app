@@ -36,7 +36,7 @@ def test_register_increment_nb_new_web_non_proton_user(flask_client):
     if existing_metric:
         Session.delete(existing_metric)
         Session.commit()
-    
+
     daily_metric = DailyMetric.get_or_create_today_metric()
     Session.commit()
     nb_new_web_non_proton_user = daily_metric.nb_new_web_non_proton_user
