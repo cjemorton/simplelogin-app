@@ -60,6 +60,12 @@ uv run pre-commit install
 
 To install it in your development environment.
 
+## Code Quality Requirements
+
+All files must be free of trailing whitespace. This is enforced via pre-commit hooks.
+
+Run `pre-commit run --all-files` before committing to ensure all linters pass.
+
 ## Run tests
 
 For most tests, you will need to have ``redis`` installed and started on your machine (listening on port 6379).
