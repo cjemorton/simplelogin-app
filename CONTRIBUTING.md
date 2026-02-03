@@ -64,7 +64,162 @@ To install it in your development environment.
 
 All files must be free of trailing whitespace. This is enforced via pre-commit hooks.
 
-Run `pre-commit run --all-files` before committing to ensure all linters pass.
+Before submitting any code changes, you must run the following lint and format checks:
+
+### Pre-commit Hooks (Recommended)
+
+Run all pre-commit hooks to check all files:
+
+```bash
+uv run pre-commit run --all-files
+```
+
+This will automatically check for:
+- Trailing whitespace
+- YAML syntax
+- Code formatting (ruff)
+- HTML template formatting (djlint)
+
+### Individual Linting Tools
+
+You can also run individual tools if needed:
+
+#### Python Code Formatting
+```bash
+uv run ruff format .
+```
+
+#### Python Code Linting
+```bash
+uv run flake8
+```
+
+Or use ruff for faster linting:
+```bash
+uv run ruff check .
+```
+
+#### HTML Template Checking
+```bash
+uv run djlint --check templates
+```
+
+To automatically reformat templates:
+```bash
+uv run djlint --reformat .
+```
+
+**Important**: All of these checks must pass before your pull request can be merged. Running `uv run pre-commit run --all-files` is the easiest way to ensure compliance.
+
+## Logging Best Practices
+
+SimpleLogin uses centralized logging configured in `app/log.py`. Please follow these guidelines:
+
+### Using the Logger
+
+Always use the centralized logger, never use `print()` for application logging:
+
+```python
+from app.log import LOG
+
+# Good: Use the logger
+LOG.info("Processing email for user %s", user.email)
+LOG.debug("Detailed debug information: %s", data)
+LOG.warning("Potential issue detected: %s", issue)
+LOG.error("Error occurred: %s", error_msg)
+LOG.exception("Exception with traceback")  # Automatically includes stack trace
+
+# Bad: Don't use print() for application logs
+print("Processing email...")  # ❌ Don't do this
+```
+
+### Logger Methods and Shortcuts
+
+The logger provides convenient shortcut methods:
+
+```python
+# Full method names
+LOG.debug("Debug message")
+LOG.info("Info message")
+LOG.warning("Warning message")
+LOG.exception("Error with traceback")  # Must be in exception handler
+
+# Shortcut methods (same as above)
+LOG.d("Debug message")
+LOG.i("Info message")
+LOG.w("Warning message")
+LOG.e("Error with traceback")  # Must be in exception handler
+```
+
+**Important**: Use `LOG.exception()` (or `LOG.e()`) only within exception handlers to automatically capture the stack trace:
+
+```python
+try:
+    risky_operation()
+except Exception:
+    LOG.exception("Failed to process operation")  # Automatically includes traceback
+    # or with more context:
+    # LOG.exception("Failed to process operation for user %s", user_id)
+```
+
+### Log Levels
+
+- **DEBUG** (`LOG.debug` / `LOG.d`): Detailed diagnostic information, typically only useful during development
+- **INFO** (`LOG.info` / `LOG.i`): General informational messages about application flow
+- **WARNING** (`LOG.warning` / `LOG.w`): Warnings about potentially problematic situations
+- **ERROR/EXCEPTION** (`LOG.exception` / `LOG.e`): Errors and exceptions with stack traces
+
+### Contextual Information
+
+The logging system automatically adds contextual information to each log:
+- **request_id**: For tracking HTTP requests (automatically added in Flask context)
+- **message_id**: For tracking email processing lifecycle (set via `set_message_id()`)
+- **process_id**: The process ID handling the request
+- **timestamp**: In UTC/GMT timezone
+- **source location**: File path, line number, and function name
+
+### Controlling Log Verbosity
+
+Use environment variables to control log levels:
+
+```bash
+# Local development (more verbose)
+LOG_LEVEL=DEBUG
+
+# Production (less verbose, default)
+LOG_LEVEL=INFO
+
+# Suppress library log spam (default: enabled)
+SILENCE_FLANKER_LOGS=1
+```
+
+### Testing with Logs
+
+When writing tests that involve logging:
+
+```python
+def test_something(caplog):
+    """Test that uses pytest's caplog fixture to capture logs."""
+    from app.log import LOG
+
+    # Your test code that logs
+    LOG.info("Test message")
+
+    # Verify log messages
+    assert "Test message" in caplog.text
+```
+
+### When to Use print()
+
+Reserve `print()` statements for:
+- Command-line scripts intended for user interaction (in `commands/` directory)
+- Configuration/startup messages that must appear before logging is initialized
+- Development debugging (but remove before committing)
+
+Do NOT use `print()` for:
+- Application logic logging
+- Error reporting
+- Debugging production issues
 
 ## Run tests
 
@@ -163,29 +318,20 @@ Here are the small sum-ups of the directory structures and their roles:
 
 ## Pull request
 
-The code is formatted using [ruff](https://github.com/astral-sh/ruff), to format the code, simply run
+Before creating a pull request, please ensure all code quality checks pass as described in the [Code Quality Requirements](#code-quality-requirements) section above.
 
-```
-uv run ruff format .
-```
-
-The code is also checked with `flake8`, make sure to run `flake8` before creating the pull request by
+The easiest way to verify this is to run:
 
 ```bash
-uv run flake8
+uv run pre-commit run --all-files
 ```
 
-For HTML templates, we use `djlint`. Before creating a pull request, please run
-
-```bash
-uv run djlint --check templates
-```
-
-If some files aren't properly formatted, you can format all files with
-
-```bash
-uv run djlint --reformat .
-```
+This single command will run all required checks including:
+- Code formatting (ruff)
+- Linting (flake8, ruff)
+- HTML template formatting (djlint)
+- Trailing whitespace checks
+- YAML syntax validation
 
 ## Test sending email
 
