@@ -6,63 +6,119 @@ on:
       - master
     tags:
       - v*
+    # Path filters: Skip workflow for documentation-only changes
+    # This saves CI resources when only markdown/docs are modified
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
   pull_request:
+    # Path filters: Only run workflow when app code, scripts, configs, or workflows change
+    # Excludes documentation-only PRs to speed up feedback loop
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+# Concurrency control: Cancel in-progress runs for the same PR/branch
+# This prevents wasting CI resources on outdated commits when developers push frequently
+# Each PR/branch gets its own concurrency group to avoid cross-contamination
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 env:
   CMAKE_POLICY_VERSION_MINIMUM: 3.5
   UV_VERSION: 0.8.18
 
 jobs:
+  # Lint job: Runs formatting and linting checks
+  # This job runs in parallel with the test job for faster feedback
   lint:
-    runs-on: ubuntu-latest
+    # Using ubuntu-22.04: Latest stable LTS runner with better performance
+    # and longer support window than ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out repo
         uses: actions/checkout@v3
 
+      # Python/uv setup with built-in caching
+      # enable-cache: true leverages uv's native cache management
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
-          # Install a specific version of uv.
           version: ${{ env.UV_VERSION }}
           enable-cache: true
+
+      # Cache for system dependencies to speed up repeated builds
+      # These dependencies rarely change, so caching provides significant speedup
+      - name: Cache system dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/apt/archives
+          key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/main.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-
 
       - name: Install OS dependencies
         run: |
           sudo apt update
           sudo apt install -y libre2-dev libpq-dev
 
+      # Additional cache for uv's virtual environment and installed packages
+      # This dramatically speeds up dependency installation across runs
+      - name: Cache uv packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            .venv
+          key: ${{ runner.os }}-uv-${{ hashFiles('uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
       - name: Install dependencies
-        if: steps.setup-uv.outputs.cache-hit != 'true'
         run: uv sync --locked --all-extras
 
       - name: Check formatting & linting
         run: |
           uv run pre-commit run --all-files
 
-
+  # Test job: Runs the test suite with parallelization
+  # Uses a matrix strategy to split tests into 4 shards for maximum speed
+  # Each shard runs independently and in parallel with other shards
   test:
-    runs-on: ubuntu-latest
+    # Using ubuntu-22.04: Latest stable LTS runner
+    runs-on: ubuntu-22.04
+    
+    # Matrix strategy: Splits test suite into 4 parallel shards
+    # This reduces total test time by ~4x (minus overhead)
+    # Each shard runs a subset of tests determined by pytest-xdist
+    strategy:
+      # fail-fast: true stops all shards if any shard fails
+      # This provides faster feedback and saves CI resources on failures
+      fail-fast: true
+      matrix:
+        # 4 shards provides good balance between parallelization gains
+        # and CI runner availability/cost
+        shard: [1, 2, 3, 4]
 
-    # service containers to run with `postgres-job`
+    # Service containers: Postgres and Redis for integration tests
+    # These are real services (not mocks) to ensure tests match production behavior
+    # Note: Each matrix shard gets its own isolated service container instance
     services:
-      # label used to access the service container
+      # Postgres 13: Production-like database for testing
+      # Each test shard connects to its own postgres instance to avoid conflicts
       postgres:
-        # Docker Hub image
         image: postgres:13
-        # service environment variables
-        # `POSTGRES_HOST` is `postgres`
         env:
-          # optional (defaults to `postgres`)
           POSTGRES_DB: test
-          # required
           POSTGRES_PASSWORD: test
-          # optional (defaults to `5432`)
           POSTGRES_PORT: 5432
-          # optional (defaults to `postgres`)
           POSTGRES_USER: test
         ports:
           - 15432:5432
-        # set health checks to wait until postgres has started
+        # Health checks ensure postgres is ready before tests start
+        # This prevents flaky test failures due to connection issues
         options: >-
           --health-cmd pg_isready
           --health-interval 10s
@@ -73,48 +129,86 @@ jobs:
       - name: Check out repo
         uses: actions/checkout@v3
 
+      # Python/uv setup with built-in caching
       - name: Install uv
         uses: astral-sh/setup-uv@v5
         with:
-          # Install a specific version of uv.
           version: ${{ env.UV_VERSION }}
           enable-cache: true
+
+      # Cache for system dependencies
+      - name: Cache system dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/apt/archives
+          key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/main.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-
 
       - name: Install OS dependencies
         run: |
           sudo apt update
           sudo apt install -y libre2-dev libpq-dev
 
+      # Cache for uv packages - critical for test performance
+      # Each shard benefits from this shared cache
+      - name: Cache uv packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            .venv
+          key: ${{ runner.os }}-uv-${{ hashFiles('uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
       - name: Install dependencies
-        if: steps.setup-uv.outputs.cache-hit != 'true'
         run: uv sync --locked --all-extras
 
+      # Install pytest-xdist for test parallelization and sharding
+      # pytest-xdist provides the --shard-id and --num-shards options
+      # used to distribute tests across matrix shards
+      - name: Install pytest-xdist
+        run: uv pip install pytest-xdist
 
+      # Redis v6: Real Redis instance for caching/session tests
+      # Each matrix shard gets its own Redis to prevent test interference
       - name: Start Redis v6
         uses: superchargejs/redis-github-action@1.1.0
         with:
           redis-version: 6
 
+      # Database migration: Set up schema before tests
       - name: Run db migration
         run: |
           CONFIG=tests/test.env uv run alembic upgrade head
 
+      # Generate build info for tests that may depend on version metadata
       - name: Prepare version file
         run: |
           scripts/generate-build-info.sh ${{ github.sha }} ${{ github.ref_name }}
           cat app/build_info.py
 
-      - name: Test with pytest
+      # Run tests with pytest-xdist sharding
+      # --shard-id and --num-shards distribute tests across matrix runners
+      # This is deterministic: same tests always run on same shard
+      # -n auto uses all available CPU cores within each shard for additional speedup
+      - name: Test with pytest (shard ${{ matrix.shard }}/4)
         run: |
-          uv run pytest
+          uv run pytest -c pytest.ci.ini --shard-id=${{ matrix.shard }} --num-shards=4 -n auto
         env:
           GITHUB_ACTIONS_TEST: true
 
+      # Archive coverage per shard for potential merge/analysis later
+      # Each shard produces its own coverage report
+      # In a follow-up job, these could be combined for complete coverage
       - name: Archive code coverage results
         uses: actions/upload-artifact@v4
         with:
-          name: code-coverage-report
+          name: code-coverage-report-shard-${{ matrix.shard }}
           path: htmlcov
+          if-no-files-found: warn
 
   build:
     runs-on: ubuntu-latest

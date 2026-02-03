@@ -1,4 +1,16 @@
-# Run tests
+# Run tests locally or in CI
+# 
+# LOCAL DEVELOPMENT:
+# For faster local testing, use pytest-xdist to run tests in parallel:
+#   uv run pytest -n auto
+# 
+# For testing a specific shard (useful for debugging CI failures):
+#   uv run pytest --shard-id=1 --num-shards=4 -n auto
+#
+# CI ENVIRONMENT:
+# In CI, tests are automatically split into 4 shards via GitHub Actions matrix
+# Each shard runs: pytest -c pytest.ci.ini --shard-id=X --num-shards=4 -n auto
+# The -n auto flag uses all available CPU cores within each shard
 
 # Delete the test DB if it isn't properly removed
 docker rm -f sl-test-db
@@ -13,6 +25,10 @@ sleep 3
 CONFIG=tests/test.env uv run alembic upgrade head
 
 # run test
+# For local testing with parallelization, you can use:
+#   uv run pytest -c pytest.ci.ini -n auto
+# For testing specific shards locally:
+#   uv run pytest -c pytest.ci.ini --shard-id=1 --num-shards=4 -n auto
 uv run pytest -c pytest.ci.ini
 
 # Delete the test DB

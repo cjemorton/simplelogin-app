@@ -60,6 +60,139 @@ uv run pre-commit install
 
 To install it in your development environment.
 
+## CI/CD & Testing Standards
+
+To maintain fast feedback loops and efficient use of CI resources, all workflows and tests must follow these standards:
+
+### Workflow Requirements
+
+All GitHub Actions workflows must implement the following optimizations:
+
+1. **Parallelization with Matrix Strategy**
+   - Use matrix strategies to split jobs into parallel runs where applicable
+   - For test suites, use a minimum of 4 shards (adjustable based on test suite size)
+   - Example:
+     ```yaml
+     strategy:
+       fail-fast: true
+       matrix:
+         shard: [1, 2, 3, 4]
+     ```
+
+2. **Test Partitioning with pytest-xdist**
+   - All test jobs must use pytest-xdist for sharding across matrix runners
+   - Use `--shard-id` and `--num-shards` flags to distribute tests deterministically
+   - Use `-n auto` within each shard for additional CPU-level parallelization
+   - Example:
+     ```bash
+     pytest --shard-id=${{ matrix.shard }} --num-shards=4 -n auto
+     ```
+
+3. **Caching**
+   - Use `actions/cache` to cache Python/uv packages (`~/.cache/uv`, `.venv`)
+   - Cache system dependencies when appropriate (e.g., apt packages)
+   - Use lock file hashes in cache keys (e.g., `uv.lock`) for accurate invalidation
+   - Example:
+     ```yaml
+     - uses: actions/cache@v4
+       with:
+         path: |
+           ~/.cache/uv
+           .venv
+         key: ${{ runner.os }}-uv-${{ hashFiles('uv.lock') }}
+     ```
+
+4. **Fail-Fast Pattern**
+   - Set `fail-fast: true` in matrix strategies to cancel remaining jobs on first failure
+   - This provides faster feedback and conserves CI resources
+
+5. **Path-Based Filters**
+   - Use `paths` and `paths-ignore` on workflow triggers to skip unnecessary runs
+   - Exclude documentation-only changes from running full test suites
+   - Example:
+     ```yaml
+     on:
+       pull_request:
+         paths-ignore:
+           - '**.md'
+           - 'docs/**'
+     ```
+
+6. **Concurrency Control**
+   - Implement concurrency groups to cancel in-progress runs on new pushes
+   - Especially important for PR workflows to avoid resource waste
+   - Example:
+     ```yaml
+     concurrency:
+       group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+       cancel-in-progress: true
+     ```
+
+7. **Modern Runners**
+   - Use `ubuntu-22.04` or later for better performance and support
+   - Avoid `ubuntu-latest` to ensure predictable environment
+
+8. **Comprehensive Comments**
+   - Add inline comments explaining all optimization choices (caching, sharding, concurrency, etc.)
+   - Document the impact and reasoning behind each configuration decision
+
+### Test Suite Requirements
+
+All test suites must be structured for parallelization:
+
+1. **Parallelization Support**
+   - Tests must be compatible with pytest-xdist
+   - Avoid shared state between tests (use fixtures for isolation)
+   - Each test should be independently runnable
+
+2. **Mocking External Dependencies**
+   - Mock external APIs and services where possible to reduce flakiness
+   - Use real database/Redis instances only when testing integration points
+   - Document why real services are used when mocks aren't sufficient
+   - All mocking logic must be well-commented for maintainability
+
+3. **Deterministic Tests**
+   - Tests must produce consistent results across runs
+   - Avoid time-based assertions that can fail under load
+   - Use fixed seeds for any random data generation
+
+4. **Performance Considerations**
+   - New tests should complete in reasonable time (< 10 seconds individually)
+   - Slow integration tests must be documented and justified
+   - Consider using markers (e.g., `@pytest.mark.slow`) for categorization
+
+### Local Development Testing
+
+For local test development and debugging:
+
+```bash
+# Run all tests in parallel (recommended for full test suite)
+uv run pytest -n auto
+
+# Run a specific test file
+uv run pytest tests/api/test_specific.py -n auto
+
+# Test a specific shard (useful for debugging CI shard failures)
+uv run pytest --shard-id=1 --num-shards=4 -n auto
+
+# Run tests without parallelization (useful for debugging)
+uv run pytest
+
+# Run a single test
+uv run pytest tests/api/test_specific.py::test_function_name -v
+```
+
+### Pull Request Checklist
+
+Before submitting a PR:
+
+- [ ] All new workflows implement parallelization, caching, fail-fast, and path filters
+- [ ] New tests are compatible with pytest-xdist (no shared state issues)
+- [ ] Integration tests use appropriate mocking or document why real services are needed
+- [ ] No new slow or non-deterministic tests without justification
+- [ ] All optimization choices are documented with inline comments
+- [ ] Local tests pass with both serial and parallel execution
+
 ## Run tests
 
 For most tests, you will need to have ``redis`` installed and started on your machine (listening on port 6379).
