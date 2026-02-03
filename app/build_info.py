@@ -1,3 +1,3 @@
-SHA1 = "dev"
-BUILD_TIME = "1652365083"
-VERSION = SHA1
+SHA1 = "test-sha"
+BUILD_TIME = "1770115960"
+VERSION = "test-version"
