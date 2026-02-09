@@ -25,6 +25,8 @@ env:
 jobs:
   lint:
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     steps:
       - name: Check out repo
         uses: actions/checkout@v3
@@ -69,6 +71,8 @@ jobs:
 
   test:
     runs-on: ubuntu-22.04
+    permissions:
+      contents: read
     strategy:
       fail-fast: true
       matrix:
