@@ -228,13 +228,13 @@ This section creates a Postgres database using Docker.
 
 If you already have a Postgres database in use, you can skip this section and just copy the database configuration (i.e. host, port, username, password, database name) to use in the next sections.
 
-Run a Postgres Docker container as your Postgres database server. Make sure to replace `myuser` and `mypassword` with something more secret.
+Run a Postgres Docker container as your Postgres database server. Make sure to replace `test` and `test` with something more secret for production.
 
 ```bash
 docker run -d \
     --name sl-db \
-    -e POSTGRES_PASSWORD=mypassword \
-    -e POSTGRES_USER=myuser \
+    -e POSTGRES_PASSWORD=test \
+    -e POSTGRES_USER=test \
     -e POSTGRES_DB=simplelogin \
     -p 127.0.0.1:5432:5432 \
     -v $(pwd)/sl/db:/var/lib/postgresql/data \
@@ -246,7 +246,7 @@ docker run -d \
 To test whether the database operates correctly or not, run the following command:
 
 ```bash
-docker exec -it sl-db psql -U myuser simplelogin
+docker exec -it sl-db psql -U test simplelogin
 ```
 
 you should be logged in the postgres console. Type `exit` to exit postgres console.
@@ -341,13 +341,13 @@ openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/private/ss
 ```
 
 Create the `/etc/postfix/pgsql-relay-domains.cf` file with the following content.
-Make sure that the database config is correctly set, replace `mydomain.com` with your domain, update 'myuser' and 'mypassword' with your postgres credentials.
+Make sure that the database config is correctly set, replace `mydomain.com` with your domain, update 'test' and 'test' with your postgres credentials.
 
 ```
 # postgres config
 hosts = localhost
-user = myuser
-password = mypassword
+user = test
+password = test
 dbname = simplelogin
 
 query = SELECT domain FROM custom_domain WHERE domain='%s' AND verified=true
@@ -355,13 +355,13 @@ query = SELECT domain FROM custom_domain WHERE domain='%s' AND verified=true
 ```
 
 Create the `/etc/postfix/pgsql-transport-maps.cf` file with the following content.
-Again, make sure that the database config is correctly set, replace `mydomain.com` with your domain, update 'myuser' and 'mypassword' with your postgres credentials.
+Again, make sure that the database config is correctly set, replace `mydomain.com` with your domain, update 'test' and 'test' with your postgres credentials.
 
 ```
 # postgres config
 hosts = localhost
-user = myuser
-password = mypassword
+user = test
+password = test
 dbname = simplelogin
 
 # forward to smtp:127.0.0.1:20381 for custom domain AND email domain
@@ -381,7 +381,7 @@ To run SimpleLogin, you need a config file at `$(pwd)/simplelogin.env`. Below is
 
 - replace `mydomain.com` by your domain,
 - set `FLASK_SECRET` to a secret string,
-- update 'myuser' and 'mypassword' with your database credentials used in previous step.
+- update 'test' and 'test' with your database credentials used in previous step.
 
 All possible parameters can be found in [config example](example.env). Some are optional and are commented out by default.
 Some have "dummy" values, fill them up if you want to enable these features (Paddle, AWS, etc).
@@ -407,7 +407,7 @@ DISABLE_ALIAS_SUFFIX=1
 DKIM_PRIVATE_KEY_PATH=/dkim.key
 
 # DB Connection
-DB_URI=postgresql://myuser:mypassword@sl-db:5432/simplelogin
+DB_URI=postgresql://test:test@sl-db:5432/simplelogin
 
 FLASK_SECRET=put_something_secret_here
 
@@ -534,7 +534,7 @@ By default, new accounts are not premium so don't have unlimited alias. To make 
 please go to the database, table "users" and set "lifetime" column to "1" or "TRUE":
 
 ```
-docker exec -it sl-db psql -U myuser simplelogin
+docker exec -it sl-db psql -U test simplelogin
 UPDATE users SET lifetime = TRUE;
 exit
 ```

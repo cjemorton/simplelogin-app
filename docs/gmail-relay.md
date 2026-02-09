@@ -164,7 +164,7 @@ DISABLE_ALIAS_SUFFIX=1
 DKIM_PRIVATE_KEY_PATH=/dkim.key
 
 # DB Connection
-DB_URI=postgresql://mysqluser:mysqlpassword@sl-db:5432/simplelogin
+DB_URI=postgresql://test:test@sl-db:5432/simplelogin
 
 FLASK_SECRET=SomeThing_Secret
 

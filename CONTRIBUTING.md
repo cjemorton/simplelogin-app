@@ -252,13 +252,13 @@ cp example.env .env
 You need to edit your .env to reflect the postgres exposed port, edit the `DB_URI` to:
 
 ```
-DB_URI=postgresql://myuser:mypassword@localhost:35432/simplelogin
+DB_URI=postgresql://test:test@localhost:15432/simplelogin
 ```
 
 Run the postgres database:
 
 ```bash
-docker run -e POSTGRES_PASSWORD=mypassword -e POSTGRES_USER=myuser -e POSTGRES_DB=simplelogin -p 15432:5432 postgres:13
+docker run -e POSTGRES_PASSWORD=test -e POSTGRES_USER=test -e POSTGRES_DB=simplelogin -p 15432:5432 postgres:13
 ```
 
 To run the server:

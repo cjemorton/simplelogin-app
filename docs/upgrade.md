@@ -134,11 +134,11 @@ sudo docker rm -f sl-email sl-migration sl-app sl-db
 # create ./sl/upload/ if not exist
 mkdir -p ./sl/upload/
 
-# Run the database container. Make sure to replace `myuser` and `mypassword`
+# Run the database container. Make sure to replace `test` and `test` with secure credentials for production
 docker run -d \
     --name sl-db \
-    -e POSTGRES_PASSWORD=mypassword \
-    -e POSTGRES_USER=myuser \
+    -e POSTGRES_PASSWORD=test \
+    -e POSTGRES_USER=test \
     -e POSTGRES_DB=simplelogin \
     -p 127.0.0.1:5432:5432 \
     -v $(pwd)/sl/db:/var/lib/postgresql/data \
