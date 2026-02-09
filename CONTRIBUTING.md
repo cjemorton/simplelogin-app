@@ -3,7 +3,7 @@ Thanks for taking the time to contribute! 🎉👍
 Before working on a new feature, please get in touch with us at dev[at]simplelogin.io to avoid duplication.
 We can also discuss the best way to implement it.
 
-The project uses Flask, Python3.7+ and requires Postgres 12+ as dependency.
+The project uses Flask, Python 3.12 and requires Postgres 13+ as dependency.
 
 ## General Architecture
 
@@ -154,6 +154,52 @@ Here are the small sum-ups of the directory structures and their roles:
 - static/: files available at `/static` url.
 - templates/: contains both html and email templates.
 - tests/: tests. We don't really distinguish unit, functional or integration test. A test is simply here to make sure a feature works correctly.
+
+## CI/CD & Testing Standards
+
+### Python Version
+This project requires **Python 3.12**. The `.python-version` file specifies `3.12` (not a specific patch version) to allow flexibility with available Python versions on CI runners and local environments.
+
+### Database Credentials
+Tests use PostgreSQL 13+ with credentials `test:test@localhost:15432/test`. These are configured in `tests/test.env` and must match for both local development and CI.
+
+### Parallel Testing
+The CI workflow uses parallel testing to speed up test execution:
+- **pytest-xdist**: Parallelizes tests across CPU cores with `-n auto`
+- **pytest-shard**: Splits tests into 4 shards distributed across separate CI runners
+
+To run tests locally with parallelization:
+```bash
+# Install parallelization plugins
+uv pip install pytest-xdist pytest-shard
+
+# Run with sharding (like CI)
+uv run pytest -c pytest.ci.ini --shard-id=1 --num-shards=4 -n auto
+```
+
+### Local Testing Commands
+```bash
+# Standard local test run
+sh scripts/run-test.sh
+
+# With local Postgres DB (faster, no Docker overhead)
+dropdb test && createdb test && DB_URI=postgresql://localhost:5432/test uv run alembic upgrade head
+# Update tests/test.env: DB_URI=postgresql://localhost:5432/test
+uv run pytest -c pytest.ci.ini
+```
+
+### CI Workflow Optimizations
+The GitHub Actions workflow (`.github/workflows/main.yml`) includes:
+- **Caching**: uv packages, apt packages, and virtual environments are cached to speed up builds
+- **Path filters**: Documentation changes (*.md, docs/) skip CI runs
+- **Concurrency groups**: Cancel in-progress workflows when new commits are pushed to the same PR/branch
+- **Test sharding**: 4 parallel test runners split the test suite for faster execution
+- **Pinned runner**: Uses `ubuntu-22.04` for reproducible builds (not `ubuntu-latest`)
+
+### Race Condition Fixes
+When running tests in parallel:
+- The `pg_trgm` extension is created idempotently with `CREATE EXTENSION IF NOT EXISTS`
+- The `daily_metric` table is cleared before tests to prevent unique constraint violations
 
 ## Pull request
 
