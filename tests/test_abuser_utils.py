@@ -3,7 +3,6 @@ import hmac
 import secrets
 
 import pytest
-from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes as crypto_hashes
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
 
@@ -52,7 +51,6 @@ def helper_derive_kek_for_identifier_test(identifier_address: str) -> bytes:
         length=32,
         salt=None,
         info=hkdf_info_bytes,
-        backend=default_backend(),
     )
 
     return hkdf.derive(MOCK_MASTER_ENC_KEY)
