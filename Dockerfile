@@ -1,10 +1,10 @@
 # Install npm packages
-FROM node:10.17.0-alpine AS npm
+FROM node:22-alpine AS npm
 WORKDIR /code
 COPY ./static/package*.json /code/static/
 RUN cd /code/static && npm ci
 
-FROM --platform=linux/amd64 ubuntu:22.04
+FROM --platform=linux/amd64 ubuntu:24.04
 
 ARG UV_VERSION="0.7.13"
 ARG UV_HASH="909278eb197c5ed0e9b5f16317d1255270d1f9ea4196e7179ce934d48c4c2545"

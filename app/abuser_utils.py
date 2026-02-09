@@ -5,7 +5,6 @@ from hashlib import sha256
 from typing import List, Dict, Optional
 
 from cryptography.exceptions import InvalidTag
-from cryptography.hazmat.backends import default_backend
 from cryptography.hazmat.primitives import hashes as crypto_hashes
 from cryptography.hazmat.primitives.ciphers.aead import AESGCM
 from cryptography.hazmat.primitives.kdf.hkdf import HKDF
@@ -30,7 +29,6 @@ def _derive_key_for_identifier(master_key: bytes, identifier_address: str) -> by
         length=32,
         salt=config.ABUSER_HKDF_SALT,
         info=hkdf_info,
-        backend=default_backend(),
     )
 
     return hkdf.derive(master_key)
