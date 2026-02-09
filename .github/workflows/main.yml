@@ -6,7 +6,17 @@ on:
       - master
     tags:
       - v*
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
   pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'docs/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 env:
   CMAKE_POLICY_VERSION_MINIMUM: 3.5
@@ -14,7 +24,7 @@ env:
 
 jobs:
   lint:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out repo
         uses: actions/checkout@v3
@@ -26,13 +36,32 @@ jobs:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
 
+      - name: Cache uv packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            .venv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
+      - name: Cache system dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/apt
+            /var/lib/apt
+          key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/main.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-
+
       - name: Install OS dependencies
         run: |
           sudo apt update
           sudo apt install -y libre2-dev libpq-dev
 
       - name: Install dependencies
-        if: steps.setup-uv.outputs.cache-hit != 'true'
         run: uv sync --locked --all-extras
 
       - name: Check formatting & linting
@@ -41,7 +70,11 @@ jobs:
 
 
   test:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    strategy:
+      fail-fast: true
+      matrix:
+        shard: [1, 2, 3, 4]
 
     # service containers to run with `postgres-job`
     services:
@@ -80,15 +113,36 @@ jobs:
           version: ${{ env.UV_VERSION }}
           enable-cache: true
 
+      - name: Cache uv packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/uv
+            .venv
+          key: ${{ runner.os }}-uv-${{ hashFiles('**/uv.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-uv-
+
+      - name: Cache system dependencies
+        uses: actions/cache@v4
+        with:
+          path: |
+            /var/cache/apt
+            /var/lib/apt
+          key: ${{ runner.os }}-apt-${{ hashFiles('.github/workflows/main.yml') }}
+          restore-keys: |
+            ${{ runner.os }}-apt-
+
       - name: Install OS dependencies
         run: |
           sudo apt update
           sudo apt install -y libre2-dev libpq-dev
 
       - name: Install dependencies
-        if: steps.setup-uv.outputs.cache-hit != 'true'
         run: uv sync --locked --all-extras
 
+      - name: Install pytest plugins for parallelization
+        run: uv pip install pytest-xdist pytest-shard
 
       - name: Start Redis v6
         uses: superchargejs/redis-github-action@1.1.0
@@ -106,15 +160,16 @@ jobs:
 
       - name: Test with pytest
         run: |
-          uv run pytest
+          uv run pytest -c pytest.ci.ini --shard-id=${{ matrix.shard }} --num-shards=4 -n auto
         env:
           GITHUB_ACTIONS_TEST: true
 
       - name: Archive code coverage results
         uses: actions/upload-artifact@v4
         with:
-          name: code-coverage-report
+          name: code-coverage-report-shard-${{ matrix.shard }}
           path: htmlcov
+          if-no-files-found: warn
 
   build:
     runs-on: ubuntu-latest

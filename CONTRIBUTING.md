@@ -3,7 +3,7 @@ Thanks for taking the time to contribute! 🎉👍
 Before working on a new feature, please get in touch with us at dev[at]simplelogin.io to avoid duplication.
 We can also discuss the best way to implement it.
 
-The project uses Flask, Python3.7+ and requires Postgres 12+ as dependency.
+The project uses Flask, Python 3.12 and requires Postgres 13+ as dependency.
 
 ## General Architecture
 
@@ -20,7 +20,7 @@ SimpleLogin backend consists of 2 main components:
 ## Install dependencies
 
 The project requires:
-- Python 3.10 and uv to manage dependencies
+- Python 3.12 and uv to manage dependencies
 - Node v10 for front-end.
 - Postgres 13+
 
@@ -70,9 +70,24 @@ sh scripts/run-test.sh
 
 You can also run tests using a local Postgres DB to speed things up. This can be done by
 
-- creating an empty test DB and running the database migration by `dropdb test && createdb test && DB_URI=postgresql://localhost:5432/test uv run alembic upgrade head`
+- creating an empty test DB and running the database migration by `dropdb test && createdb test && DB_URI=postgresql://test:test@localhost:5432/test uv run alembic upgrade head`
 
-- replacing the `DB_URI` in `test.env` file by `DB_URI=postgresql://localhost:5432/test`
+- replacing the `DB_URI` in `tests/test.env` file by `DB_URI=postgresql://test:test@localhost:5432/test`
+
+### Running tests in parallel
+
+To run tests with parallelization locally (similar to CI):
+
+```bash
+# Install parallel testing plugins
+uv pip install pytest-xdist pytest-shard
+
+# Run tests with parallelization (uses all available CPUs)
+uv run pytest -c pytest.ci.ini -n auto
+
+# Run a specific shard (e.g., shard 1 of 4 total shards)
+uv run pytest -c pytest.ci.ini --shard-id=1 --num-shards=4 -n auto
+```
 
 ## Run the code locally
 
@@ -137,6 +152,39 @@ There are two scripts to reset your local db to an empty state:
 server.py locally.
 - `scripts/reset_test_db.sh` will reset your test db to the latest migration without adding the dev server data to prevent interferring with
 the tests.
+
+## CI/CD & Testing Standards
+
+Our CI/CD pipeline uses GitHub Actions with the following optimizations and requirements:
+
+### Test Parallelization
+- **Test Matrix**: Tests run across 4 parallel shards using `pytest-shard`
+- **CPU Parallelization**: Within each shard, tests run in parallel using `pytest-xdist` with `-n auto`
+- **Configuration**: CI uses `pytest.ci.ini` with verbose output (`-v`) and `--no-cov-on-fail`
+
+### Caching Strategy
+- **UV Packages**: Caches `~/.cache/uv` and `.venv` based on `uv.lock` hash
+- **System Dependencies**: Caches APT packages to speed up repeated builds
+
+### Path Filters
+- Workflows skip on changes to `**.md` and `docs/**` to avoid unnecessary runs
+
+### Concurrency Control
+- Uses concurrency groups: `${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}`
+- Enables `cancel-in-progress: true` to automatically cancel outdated workflow runs
+
+### Runner Configuration
+- Uses `ubuntu-22.04` runners for consistency
+- Test matrix has `fail-fast: true` to stop quickly on failures
+
+### Coverage Artifacts
+- Each shard uploads its coverage report separately: `code-coverage-report-shard-{1-4}`
+- Upload includes `if-no-files-found: warn` to catch missing coverage
+
+### Database Configuration
+- Tests use PostgreSQL 13 with credentials: `test:test@localhost:15432/test`
+- The `pg_trgm` extension is created idempotently to handle parallel test execution
+- The `daily_metric` table is cleared at the start of test sessions to prevent race conditions
 
 ## Code structure
 
