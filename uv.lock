@@ -1528,9 +1528,15 @@ wheels = [
 
 [[package]]
 name = "pyre2"
-version = "0.3.6"
+version = "0.3.10"
 source = { registry = "https://pypi.org/simple" }
-sdist = { url = "https://files.pythonhosted.org/packages/f6/71/e38ed302e3a01df2e233e77802e7ec92436621893a12824ad2f0e388dca0/pyre2-0.3.6.tar.gz", hash = "sha256:6fe972c0cadec49a5a055690e5aa29f8aebaed0fa9b7d8d3530e33719b61f91c", size = 1887208, upload-time = "2021-05-05T17:38:19.975Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/8c/0c/860068ea3bbeca4de5b65fb00eaded2170ac5f7086976d08e13ccbe8ab08/pyre2-0.3.10.tar.gz", hash = "sha256:91803818ec15e75d0dfdfe588282f28f46fff5eef9a2c893cac95327f443c585", size = 1917556, upload-time = "2025-10-08T15:08:43.914Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/3d/ef/5ff115767ec700861e183c88c7324efeb324bfa90bc27cdc7506810f478a/pyre2-0.3.10-cp312-cp312-macosx_14_0_arm64.whl", hash = "sha256:ca09d74121f3c2cf7605c4c560a990c18b78ae2def2d147bf35c45d2342696f8", size = 775287, upload-time = "2025-10-08T15:08:34.421Z" },
+    { url = "https://files.pythonhosted.org/packages/84/a8/5913af6c57733576e431f83bde7f308995e04537844f13bbd4e4e9e7a65a/pyre2-0.3.10-cp312-cp312-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:3cc9592d5d46b452a0847916c816c0ec85127af50aab3bb043557c85d9c6ec4a", size = 1130207, upload-time = "2025-10-08T15:08:35.681Z" },
+    { url = "https://files.pythonhosted.org/packages/d5/84/ef52fecc6c145b6552dcb98a68ff5f949c18923edc040b12f67e7b41882e/pyre2-0.3.10-cp312-cp312-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:c5afc0d6b4c0dfa9e760c9b98168ab1a441230d729e8b03ebdcce66744c153a1", size = 1143565, upload-time = "2025-10-08T15:08:37.101Z" },
+    { url = "https://files.pythonhosted.org/packages/e6/66/3eaf2e50ab93c90c04eb258ddbedfc3fbb8c6c1c398c1c3521f2284f1d4a/pyre2-0.3.10-cp312-cp312-win_amd64.whl", hash = "sha256:604b0a12520a119948dd74ae053db558313f5812ea841d36edf13d7b852a2e8a", size = 1445568, upload-time = "2025-10-08T15:08:38.136Z" },
+]
 
 [[package]]
 name = "pyreadline"
@@ -1928,7 +1934,7 @@ requires-dist = [
     { name = "pycryptodome", specifier = "~=3.9.8" },
     { name = "pyopenssl", specifier = "~=25.0" },
     { name = "pyotp", specifier = "~=2.4.0" },
-    { name = "pyre2", specifier = "~=0.3.6" },
+    { name = "pyre2", specifier = "~=0.3.10" },
     { name = "pyspf", specifier = "~=2.0.14" },
     { name = "python-dotenv", specifier = "~=0.14.0" },
     { name = "python-gnupg", specifier = "~=0.4.6" },

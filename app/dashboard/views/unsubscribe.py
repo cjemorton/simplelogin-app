@@ -1,6 +1,7 @@
 """
 Allow user to disable an alias or block a contact via the one click unsubscribe
 """
+
 from flask import redirect, url_for, flash, request, render_template
 from flask_login import login_required, current_user
 

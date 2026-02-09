@@ -76,9 +76,9 @@ def test_log_level_from_environment():
     actual_level_name = logging.getLevelName(LOG.level)
 
     # In test environment, we expect INFO level
-    assert (
-        actual_level_name == expected_level_name
-    ), f"Expected log level {expected_level_name}, but got {actual_level_name}"
+    assert actual_level_name == expected_level_name, (
+        f"Expected log level {expected_level_name}, but got {actual_level_name}"
+    )
 
 
 def test_silence_flanker_logs_env_var_disables_suppression():
