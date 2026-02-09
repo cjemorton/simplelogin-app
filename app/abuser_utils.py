@@ -72,9 +72,9 @@ def store_abuse_data(user: User) -> None:
             "aliases": [
                 {
                     "address": alias.email.lower() if alias.email else None,
-                    "created_at": alias.created_at.isoformat()
-                    if alias.created_at
-                    else None,
+                    "created_at": (
+                        alias.created_at.isoformat() if alias.created_at else None
+                    ),
                 }
                 for alias in aliases
                 if alias.email
@@ -82,9 +82,9 @@ def store_abuse_data(user: User) -> None:
             "mailboxes": [
                 {
                     "address": mailbox.email.lower() if mailbox.email else None,
-                    "created_at": mailbox.created_at.isoformat()
-                    if mailbox.created_at
-                    else None,
+                    "created_at": (
+                        mailbox.created_at.isoformat() if mailbox.created_at else None
+                    ),
                 }
                 for mailbox in mailboxes
                 if mailbox.email
