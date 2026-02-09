@@ -7,14 +7,14 @@ This document tracks the phased modernization of the SimpleLogin application inf
 The upgrade process is divided into three waves to minimize risk and ensure stability:
 
 - **Wave 1**: Foundation and Security - Docker environment and critical security dependencies
-- **Wave 2**: Flask Ecosystem - Flask, Werkzeug, and related web framework components  
+- **Wave 2**: Flask Ecosystem - Flask, Werkzeug, and related web framework components
 - **Wave 3**: Data Layer - SQLAlchemy 2.0 migration and database-related upgrades
 
 ---
 
 ## Wave 1: Foundation and Security (COMPLETED)
 
-**Status**: ✅ Complete  
+**Status**: ✅ Complete
 **Branch**: `copilot/upgrade-dependencies-and-docker`
 
 ### Objectives
@@ -38,6 +38,7 @@ The upgrade process is divided into three waves to minimize risk and ensure stab
 - **pyOpenSSL**: 19.1.0 → 25.1.0
 - **requests**: 2.25.1 → 2.32.5
 - **gunicorn**: 20.0.4 → 23.0.0
+- **PGPy**: 0.5.4 → 0.6.0 (required for cryptography >= 38 compatibility)
 
 #### Development Dependencies
 - **pytest**: 7.0.1 → 8.4.2
@@ -69,7 +70,7 @@ The upgrade process is divided into three waves to minimize risk and ensure stab
 
 ## Wave 2: Flask Ecosystem (PLANNED)
 
-**Status**: 🔲 Not Started  
+**Status**: 🔲 Not Started
 **Target Branch**: TBD
 
 ### Objectives
@@ -99,7 +100,7 @@ The upgrade process is divided into three waves to minimize risk and ensure stab
 
 ## Wave 3: Data Layer (PLANNED)
 
-**Status**: 🔲 Not Started  
+**Status**: 🔲 Not Started
 **Target Branch**: TBD
 
 ### Objectives
@@ -159,15 +160,15 @@ Use these prompts to continue with subsequent waves:
 
 ### Wave 2 Prompt
 ```
-Continue with Wave 2 upgrades for the SimpleLogin application as documented in WAVE_UPGRADE_STATUS.md. 
-Upgrade Flask and related web framework components while maintaining compatibility with the existing 
+Continue with Wave 2 upgrades for the SimpleLogin application as documented in WAVE_UPGRADE_STATUS.md.
+Upgrade Flask and related web framework components while maintaining compatibility with the existing
 application structure. Follow the testing and validation procedures outlined in Wave 1.
 ```
 
 ### Wave 3 Prompt
 ```
 Continue with Wave 3 upgrades for the SimpleLogin application as documented in WAVE_UPGRADE_STATUS.md.
-Migrate to SQLAlchemy 2.0 and update database query patterns. Follow the testing and validation 
+Migrate to SQLAlchemy 2.0 and update database query patterns. Follow the testing and validation
 procedures outlined in previous waves.
 ```
 
