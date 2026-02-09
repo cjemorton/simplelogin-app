@@ -228,7 +228,7 @@ This section creates a Postgres database using Docker.
 
 If you already have a Postgres database in use, you can skip this section and just copy the database configuration (i.e. host, port, username, password, database name) to use in the next sections.
 
-Run a Postgres Docker container as your Postgres database server. Make sure to replace `test` and `test` with something more secret for production.
+Run a Postgres Docker container as your Postgres database server. Make sure to replace the username `test` and password `test` with something more secret for production.
 
 ```bash
 docker run -d \
@@ -341,7 +341,7 @@ openssl req -x509 -nodes -days 3650 -newkey rsa:2048 -keyout /etc/ssl/private/ss
 ```
 
 Create the `/etc/postfix/pgsql-relay-domains.cf` file with the following content.
-Make sure that the database config is correctly set, replace `mydomain.com` with your domain, update 'test' and 'test' with your postgres credentials.
+Make sure that the database config is correctly set, replace `mydomain.com` with your domain, update the username 'test' and password 'test' with your postgres credentials.
 
 ```
 # postgres config
@@ -355,7 +355,7 @@ query = SELECT domain FROM custom_domain WHERE domain='%s' AND verified=true
 ```
 
 Create the `/etc/postfix/pgsql-transport-maps.cf` file with the following content.
-Again, make sure that the database config is correctly set, replace `mydomain.com` with your domain, update 'test' and 'test' with your postgres credentials.
+Again, make sure that the database config is correctly set, replace `mydomain.com` with your domain, update the username 'test' and password 'test' with your postgres credentials.
 
 ```
 # postgres config
@@ -381,7 +381,7 @@ To run SimpleLogin, you need a config file at `$(pwd)/simplelogin.env`. Below is
 
 - replace `mydomain.com` by your domain,
 - set `FLASK_SECRET` to a secret string,
-- update 'test' and 'test' with your database credentials used in previous step.
+- update the username 'test' and password 'test' with your database credentials used in previous step.
 
 All possible parameters can be found in [config example](example.env). Some are optional and are commented out by default.
 Some have "dummy" values, fill them up if you want to enable these features (Paddle, AWS, etc).
