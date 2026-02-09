@@ -3,7 +3,7 @@ Thanks for taking the time to contribute! 🎉👍
 Before working on a new feature, please get in touch with us at dev[at]simplelogin.io to avoid duplication.
 We can also discuss the best way to implement it.
 
-The project uses Flask, Python3.7+ and requires Postgres 12+ as dependency.
+The project uses Flask, Python 3.12 and requires Postgres 13+ as dependency.
 
 ## General Architecture
 
@@ -20,7 +20,7 @@ SimpleLogin backend consists of 2 main components:
 ## Install dependencies
 
 The project requires:
-- Python 3.10 and uv to manage dependencies
+- Python 3.12 and uv to manage dependencies
 - Node v10 for front-end.
 - Postgres 13+
 
@@ -155,6 +155,53 @@ Here are the small sum-ups of the directory structures and their roles:
 - templates/: contains both html and email templates.
 - tests/: tests. We don't really distinguish unit, functional or integration test. A test is simply here to make sure a feature works correctly.
 
+## CI/CD & Testing Standards
+
+### Python Version
+The project requires Python 3.12. The `.python-version` file specifies `3.12` (not a specific patch version) to allow flexibility with patch updates.
+
+### Database Configuration
+Tests use PostgreSQL 13+ with the following credentials:
+- Host: `localhost:15432`
+- Database: `test`
+- User: `test`
+- Password: `test`
+
+### Parallel Testing
+The CI uses parallel testing to improve test execution time:
+- **pytest-xdist**: Runs tests in parallel across CPU cores (`-n auto`)
+- **pytest-shard**: Splits tests into 4 shards for matrix parallelization
+
+To run tests locally with parallelization similar to CI:
+```bash
+# Install parallel testing plugins
+uv pip install pytest-xdist pytest-shard
+
+# Run a single shard with parallelization
+uv run pytest -c pytest.ci.ini --shard-id=1 --num-shards=4 -n auto
+```
+
+The standard local test command (via `scripts/run-test.sh`) runs without sharding:
+```bash
+sh scripts/run-test.sh
+```
+
+### CI Workflow Optimizations
+The GitHub Actions workflow includes several optimizations:
+- **Caching**: Caches uv packages and apt packages to speed up builds
+- **Path filters**: Skips CI for documentation-only changes (`**.md`, `docs/**`)
+- **Concurrency groups**: Automatically cancels outdated workflow runs
+- **Test sharding**: Runs tests across 4 parallel jobs
+- **Pinned runner**: Uses `ubuntu-22.04` for consistent test environments
+
+### Race Condition Fixes
+The test suite includes fixes for parallel execution:
+- **pg_trgm extension**: Uses `CREATE EXTENSION IF NOT EXISTS` for idempotent creation
+- **daily_metric cleanup**: Session-scoped fixture clears the `daily_metric` table before tests to prevent `UniqueViolation` errors when multiple workers call `DailyMetric.get_or_create_today_metric()` concurrently
+
+### Coverage Configuration
+The `pytest.ci.ini` file sets `--cov-fail-under=0` because when tests are sharded across multiple runners, each shard only executes ~25% of tests, producing partial coverage. Coverage is evaluated on the aggregate, not per-shard.
+
 ## Pull request
 
 The code is formatted using [ruff](https://github.com/astral-sh/ruff), to format the code, simply run
@@ -233,19 +280,16 @@ python job_runner.py
 There are several ways to setup Python and manage the project dependencies on Mac. For info we have successfully used this setup on a Mac silicon:
 
 ```bash
-# we haven't managed to make python 3.12 work
-brew install python3.10
+# Install Python 3.12
+brew install python@3.12
 
 # make sure to update the PATH so python, pip point to Python3
-# for us it can be done by adding "export PATH=/opt/homebrew/opt/python@3.10/libexec/bin:$PATH" to .zprofile
+# for us it can be done by adding "export PATH=/opt/homebrew/opt/python@3.12/libexec/bin:$PATH" to .zprofile
 
-# Although pipx is the recommended way to install uv,
-# install pipx via brew will automatically install python 3.12
-# and uv will then use python 3.12
-# so we recommend using uv this way instead
+# Install uv
 curl -sSL https://install.python-uv.org | python3 -
 
-uv install
+uv sync
 
 # activate the virtualenv and you should be good to go!
 source .venv/bin/activate

@@ -1,4 +1,10 @@
 # Run tests
+# This script runs tests locally using Docker for the test database.
+# For parallel testing similar to CI, install pytest-xdist and pytest-shard:
+#   uv pip install pytest-xdist pytest-shard
+# Then run with sharding:
+#   uv run pytest -c pytest.ci.ini --shard-id=1 --num-shards=4 -n auto
+# where --shard-id splits tests into 4 groups, and -n auto uses all CPU cores
 
 # Delete the test DB if it isn't properly removed
 docker rm -f sl-test-db
