@@ -27,12 +27,12 @@ app.config["WTF_CSRF_ENABLED"] = False
 app.config["SERVER_NAME"] = "sl.lan"
 
 # enable pg_trgm extension (idempotent — safe under parallel execution with pytest-xdist)
-with engine.connect() as conn:
-    try:
+try:
+    with engine.begin() as conn:
         conn.execute(sqlalchemy.text("CREATE EXTENSION IF NOT EXISTS pg_trgm"))
-    except sqlalchemy.exc.SQLAlchemyError as e:
-        import warnings
-        warnings.warn(f"Could not create pg_trgm extension: {e}")
+except sqlalchemy.exc.SQLAlchemyError as e:
+    import warnings
+    warnings.warn(f"Could not create pg_trgm extension: {e}")
 
 add_sl_domains()
 add_proton_partner()
