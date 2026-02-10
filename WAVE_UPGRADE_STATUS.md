@@ -115,7 +115,7 @@ The upgrade process is divided into three waves to minimize risk and ensure stab
 3. **Flask 3.x Blueprint Endpoint Names**
    - Blueprint endpoint names cannot contain dots
    - Changed: `"admin.email_search"` → `"admin_email_search"`
-   - Changed: `"admin.custom_domain_search"` → `"admin_custom_domain_search"`  
+   - Changed: `"admin.custom_domain_search"` → `"admin_custom_domain_search"`
    - Changed: `"admin.abuser_lookup"` → `"admin_abuser_lookup"`
    - Files: `app/admin/index.py`, all url_for() calls
 
@@ -155,14 +155,14 @@ The upgrade process is divided into three waves to minimize risk and ensure stab
 
 ### Migration Notes
 
-**Breaking Changes**: 
+**Breaking Changes**:
 - Applications relying on absolute URLs from url_for() need to add `_external=True` parameter
 - Blueprint endpoint names with dots must be renamed to use underscores
 - Custom session interfaces must handle bytes-to-string conversion for cookie values
 
 **API Compatibility**: All changes are isolated to configuration and imports. Core application logic remains unchanged.
 
-**Deprecated Extensions**: 
+**Deprecated Extensions**:
 - `flask-profiler` is not fully compatible with Werkzeug 3.x but made optional
 - Consider alternative profiling tools for production use
 

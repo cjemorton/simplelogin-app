@@ -160,9 +160,9 @@ def test_archive_basic_user(flask_client, monkeypatch):
 
         retrieved_bundles = get_abuser_bundles_for_address(identifier_str, -1)
 
-        assert (
-            len(retrieved_bundles) == 1
-        ), f"Could not retrieve bundle for identifier: {identifier_str}"
+        assert len(retrieved_bundles) == 1, (
+            f"Could not retrieve bundle for identifier: {identifier_str}"
+        )
 
         bundle = retrieved_bundles[0]
 

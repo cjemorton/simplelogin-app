@@ -104,7 +104,7 @@ class RedisSessionStore(SessionInterface):
         )
         # Decode bytes to string for Flask 3.x / Werkzeug 3.x compatibility
         if isinstance(signed_session_id, bytes):
-            signed_session_id = signed_session_id.decode('utf-8')
+            signed_session_id = signed_session_id.decode("utf-8")
         response.set_cookie(
             app.config["SESSION_COOKIE_NAME"],
             signed_session_id,

@@ -160,6 +160,7 @@ def create_app() -> Flask:
         LOG.d("Enable flask-profiler")
         try:
             import flask_profiler
+
             app.config["flask_profiler"] = {
                 "enabled": True,
                 "storage": {"engine": "sqlite", "FILE": FLASK_PROFILER_PATH},
@@ -172,7 +173,9 @@ def create_app() -> Flask:
             }
             flask_profiler.init_app(app)
         except ImportError:
-            LOG.w("flask-profiler is not compatible with Werkzeug 3.x, skipping profiler initialization")
+            LOG.w(
+                "flask-profiler is not compatible with Werkzeug 3.x, skipping profiler initialization"
+            )
 
     # enable CORS on /api endpoints
     CORS(app, resources={r"/api/*": {"origins": "*"}})
