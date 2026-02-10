@@ -56,7 +56,7 @@ def test_email_search_page_loads(flask_client):
     """Test that the email search page loads without errors."""
     login_admin(flask_client)
 
-    r = flask_client.get(url_for("admin.email_search.index"))
+    r = flask_client.get(url_for("admin_email_search.index"))
     assert r.status_code == 200
     assert b"Email Search" in r.data
 
@@ -65,7 +65,7 @@ def test_email_search_empty_query(flask_client):
     """Test that empty query shows the search form."""
     login_admin(flask_client)
 
-    r = flask_client.get(url_for("admin.email_search.index"))
+    r = flask_client.get(url_for("admin_email_search.index"))
     assert r.status_code == 200
     assert b"Search Query" in r.data
 
@@ -79,7 +79,7 @@ def test_email_search_user_by_email(flask_client):
     Session.commit()
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": test_user.email, "search_type": "email"},
     )
     assert r.status_code == 200
@@ -96,7 +96,7 @@ def test_email_search_user_by_id(flask_client):
     Session.commit()
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": str(test_user.id), "search_type": "email"},
     )
     assert r.status_code == 200
@@ -114,7 +114,7 @@ def test_email_search_user_by_regex(flask_client):
     Session.commit()
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": "regextest_.*@example.com", "search_type": "email"},
     )
     assert r.status_code == 200
@@ -137,7 +137,7 @@ def test_email_search_mailbox(flask_client):
     Session.commit()
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": mailbox.email, "search_type": "email"},
     )
     assert r.status_code == 200
@@ -163,7 +163,7 @@ def test_email_search_partner_user(flask_client):
     Session.commit()
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": partner_user.partner_email, "search_type": "email"},
     )
     assert r.status_code == 200
@@ -175,7 +175,7 @@ def test_email_search_no_results(flask_client):
     login_admin(flask_client)
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": "nonexistent@nowhere.com", "search_type": "email"},
     )
     assert r.status_code == 200
@@ -197,7 +197,7 @@ def test_email_search_user_with_subscription(flask_client):
     Session.commit()
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": test_user.email, "search_type": "email"},
     )
     assert r.status_code == 200
@@ -221,7 +221,7 @@ def test_email_search_user_with_audit_logs(flask_client):
     Session.commit()
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": test_user.email, "search_type": "email"},
     )
     assert r.status_code == 200
@@ -244,7 +244,7 @@ def test_email_search_user_with_abuse_logs(flask_client):
     Session.commit()
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": test_user.email, "search_type": "email"},
     )
     assert r.status_code == 200
@@ -262,7 +262,7 @@ def test_alias_search_page_loads(flask_client):
     login_admin(flask_client)
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"search_type": "alias"},
     )
     assert r.status_code == 200
@@ -283,7 +283,7 @@ def test_alias_search_by_email(flask_client):
     Session.commit()
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": alias.email, "search_type": "alias"},
     )
     assert r.status_code == 200
@@ -314,7 +314,7 @@ def test_alias_search_no_regex_support(flask_client):
 
     # Regex pattern should not match - alias search only supports exact match
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": "regex_alias_.*@sl.lan", "search_type": "alias"},
     )
     assert r.status_code == 200
@@ -345,7 +345,7 @@ def test_alias_search_deleted_alias(flask_client):
 
     # Now search for the deleted alias
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": alias_email, "search_type": "alias"},
     )
     assert r.status_code == 200
@@ -358,7 +358,7 @@ def test_alias_search_no_results(flask_client):
     login_admin(flask_client)
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": "nonexistent@sl.lan", "search_type": "alias"},
     )
     assert r.status_code == 200
@@ -381,7 +381,7 @@ def test_email_search_requires_admin(flask_client):
     )
 
     # Without follow_redirects, check for 302 redirect
-    r = flask_client.get(url_for("admin.email_search.index"))
+    r = flask_client.get(url_for("admin_email_search.index"))
     # Should be redirected (302) to dashboard
     assert r.status_code == 302
     # The redirect should be to dashboard, not to admin
@@ -391,7 +391,7 @@ def test_email_search_requires_admin(flask_client):
 def test_email_search_requires_login(flask_client):
     """Test that unauthenticated users cannot access email search."""
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         follow_redirects=True,
     )
     # Should be redirected to login
@@ -407,7 +407,7 @@ def test_search_type_defaults_to_email(flask_client):
     """Test that search type defaults to email."""
     login_admin(flask_client)
 
-    r = flask_client.get(url_for("admin.email_search.index"))
+    r = flask_client.get(url_for("admin_email_search.index"))
     assert r.status_code == 200
     # Check that email option is checked (radio button)
     assert b'value="email" checked' in r.data
@@ -418,7 +418,7 @@ def test_search_type_preserves_alias_selection(flask_client):
     login_admin(flask_client)
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": "test", "search_type": "alias"},
     )
     assert r.status_code == 200
@@ -440,7 +440,7 @@ def test_mark_abuser_button_displayed(flask_client):
     Session.commit()
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": test_user.email, "search_type": "email"},
     )
     assert r.status_code == 200
@@ -459,7 +459,7 @@ def test_unmark_abuser_button_displayed(flask_client):
     Session.commit()
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": test_user.email, "search_type": "email"},
     )
     assert r.status_code == 200
@@ -481,7 +481,7 @@ def test_mark_abuser_success(flask_client):
 
     # Mark user as abuser
     r = flask_client.post(
-        url_for("admin.email_search.mark_abuser"),
+        url_for("admin_email_search.mark_abuser"),
         data={"user_id": user_id, "note": "Test abuse reason"},
         follow_redirects=True,
     )
@@ -508,7 +508,7 @@ def test_mark_abuser_requires_note(flask_client):
 
     # Try to mark user without a note
     r = flask_client.post(
-        url_for("admin.email_search.mark_abuser"),
+        url_for("admin_email_search.mark_abuser"),
         data={"user_id": test_user.id, "note": ""},
         follow_redirects=True,
     )
@@ -533,7 +533,7 @@ def test_unmark_abuser_success(flask_client):
 
     # Unmark user as abuser
     r = flask_client.post(
-        url_for("admin.email_search.unmark_abuser"),
+        url_for("admin_email_search.unmark_abuser"),
         data={"user_id": user_id, "note": "Test unmark reason"},
         follow_redirects=True,
     )
@@ -565,7 +565,7 @@ def test_unmark_abuser_requires_note(flask_client):
 
     # Try to unmark user without a note
     r = flask_client.post(
-        url_for("admin.email_search.unmark_abuser"),
+        url_for("admin_email_search.unmark_abuser"),
         data={"user_id": test_user.id, "note": ""},
         follow_redirects=True,
     )
@@ -600,7 +600,7 @@ def test_email_search_shows_custom_domains(flask_client):
     Session.commit()
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": test_user.email, "search_type": "email"},
     )
     assert r.status_code == 200
@@ -641,7 +641,7 @@ def test_email_search_shows_domain_alias_counts(flask_client):
     Session.commit()
 
     r = flask_client.get(
-        url_for("admin.email_search.index"),
+        url_for("admin_email_search.index"),
         query_string={"query": test_user.email, "search_type": "email"},
     )
     assert r.status_code == 200

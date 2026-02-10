@@ -86,4 +86,4 @@ class SLAdminIndexView(AdminIndexView):
         if not current_user.is_authenticated or not current_user.is_admin:
             return redirect(url_for("auth.login", next=request.url))
 
-        return redirect(url_for("admin.email_search.index"))
+        return redirect(url_for("admin_email_search.index"))
