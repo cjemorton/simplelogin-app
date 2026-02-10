@@ -3,8 +3,6 @@ from datetime import timedelta
 
 import arrow
 import click
-import flask_limiter
-import flask_profiler
 import newrelic.agent
 import sentry_sdk
 import time
@@ -137,7 +135,7 @@ def create_app() -> Flask:
         app.config["SESSION_COOKIE_SECURE"] = True
     app.config["SESSION_COOKIE_SAMESITE"] = "Lax"
     if MEM_STORE_URI:
-        app.config[flask_limiter.extension.C.STORAGE_URL] = MEM_STORE_URI
+        app.config["RATELIMIT_STORAGE_URI"] = MEM_STORE_URI
         initialize_redis_services(app, MEM_STORE_URI)
 
     limiter.init_app(app)
@@ -160,17 +158,21 @@ def create_app() -> Flask:
 
     if FLASK_PROFILER_PATH:
         LOG.d("Enable flask-profiler")
-        app.config["flask_profiler"] = {
-            "enabled": True,
-            "storage": {"engine": "sqlite", "FILE": FLASK_PROFILER_PATH},
-            "basicAuth": {
+        try:
+            import flask_profiler
+            app.config["flask_profiler"] = {
                 "enabled": True,
-                "username": "admin",
-                "password": FLASK_PROFILER_PASSWORD,
-            },
-            "ignore": ["^/static/.*", "/git", "/exception", "/health"],
-        }
-        flask_profiler.init_app(app)
+                "storage": {"engine": "sqlite", "FILE": FLASK_PROFILER_PATH},
+                "basicAuth": {
+                    "enabled": True,
+                    "username": "admin",
+                    "password": FLASK_PROFILER_PASSWORD,
+                },
+                "ignore": ["^/static/.*", "/git", "/exception", "/health"],
+            }
+            flask_profiler.init_app(app)
+        except ImportError:
+            LOG.w("flask-profiler is not compatible with Werkzeug 3.x, skipping profiler initialization")
 
     # enable CORS on /api endpoints
     CORS(app, resources={r"/api/*": {"origins": "*"}})
