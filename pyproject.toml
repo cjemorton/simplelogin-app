@@ -16,7 +16,7 @@ dependencies = [
   "flask_login ~= 0.5.0",
   "wtforms ~= 2.3.3",
   "unidecode ~= 1.1.1",
-  "gunicorn ~= 20.0.4",
+  "gunicorn ~= 23.0",
   "bcrypt ~= 3.2.0",
   "python-dotenv ~= 0.14.0",
   "ipython ~= 7.31.1",
@@ -36,7 +36,7 @@ dependencies = [
   "yacron~=0.19.0",
   "flask-debugtoolbar ~= 0.11.0",
   "requests_oauthlib ~= 1.3.0",
-  "pyopenssl ~= 19.1.0",
+  "pyopenssl ~= 25.0",
   "aiosmtpd ~= 1.2",
   "dnspython ~= 2.7.0",
   "coloredlogs ~= 14.0",
@@ -59,10 +59,10 @@ dependencies = [
   "memory_profiler ~= 0.57.0",
   "gevent ~= 24.11.1",
   "email-validator ~= 2.3.0",
-  "PGPy == 0.5.4",
+  "PGPy ~= 0.6.0",
   "cbor2 ~= 5.6.0",
   "coinbase-commerce ~= 1.0.1",
-  "requests ~= 2.25.1",
+  "requests ~= 2.32.0",
   "newrelic ~= 8.8.0",
   "flanker @ git+https://github.com/mailgun/flanker.git@v0.9.15",
   "pyre2 ~= 0.3.10",
@@ -71,7 +71,7 @@ dependencies = [
   "twilio ~= 7.3.2",
   "Deprecated ~= 1.2.13",
   "MarkupSafe~=1.1.1",
-  "cryptography >= 37.0.1, < 38.0.0",
+  "cryptography ~= 44.0",
   "SQLAlchemy ~= 1.3.24",
   "redis==5.2.1",
   "newrelic-telemetry-sdk ~= 0.5.0",
@@ -137,13 +137,13 @@ find-links = [
 
 [dependency-groups]
 dev = [
-  "pytest ~= 7.0.0",
+  "pytest ~= 8.0",
   "pytest-cov ~= 3.0.0",
   "pre-commit ~= 4.1.0",
-  "black ~= 22.1.0",
+  "black ~= 24.1.0",
   "djlint==1.35.3",
-  "pylint ~= 2.14.4",
-  "ruff ~= 0.1.5",
+  "pylint ~= 3.3.0",
+  "ruff ~= 0.9.0",
 ]
 
 [build-system]

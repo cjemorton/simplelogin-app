@@ -15,3 +15,4 @@ venv/
 htmlcov
 adhoc
 .env.*
+test_output.log
