@@ -37,7 +37,7 @@ def get_browser() -> Browser:
 
     user_agent = request.user_agent
     ua_string = user_agent.string.lower() if user_agent.string else ""
-    
+
     # Werkzeug 3.x no longer parses user agent automatically
     # Check for browser keywords in the UA string
     if "edg/" in ua_string or "edge/" in ua_string:
@@ -48,7 +48,7 @@ def get_browser() -> Browser:
         return Browser.Firefox
     elif "opera/" in ua_string or "opr/" in ua_string:
         return Browser.Chrome  # Opera is Chromium-based
-    
+
     # Fallback to old method if available (backwards compatibility)
     if user_agent.browser == "edge":
         return Browser.Edge
@@ -56,7 +56,7 @@ def get_browser() -> Browser:
         return Browser.Chrome
     elif user_agent.browser in ["mozilla", "firefox"]:
         return Browser.Firefox
-    
+
     return Browser.Other
 
 

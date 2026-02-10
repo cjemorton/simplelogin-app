@@ -1,6 +1,5 @@
 import arrow
 
-from app.config import EMAIL_DOMAIN
 from app.db import Session
 from app.models import CoinbaseSubscription
 from app.payments.coinbase import handle_coinbase_event
