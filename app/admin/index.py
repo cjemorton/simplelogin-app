@@ -40,14 +40,14 @@ def init_admin(app: Flask):
     admin = Admin(name="SimpleLogin", template_mode="bootstrap4")
 
     admin.init_app(app, index_view=SLAdminIndexView())
-    admin.add_view(EmailSearchAdmin(name="Email Search", endpoint="admin.email_search"))
+    admin.add_view(EmailSearchAdmin(name="Email Search", endpoint="admin_email_search"))
     admin.add_view(
         CustomDomainSearchAdmin(
-            name="Custom domain search", endpoint="admin.custom_domain_search"
+            name="Custom domain search", endpoint="admin_custom_domain_search"
         )
     )
     admin.add_view(
-        AbuserLookupAdmin(name="Abuser Lookup", endpoint="admin.abuser_lookup")
+        AbuserLookupAdmin(name="Abuser Lookup", endpoint="admin_abuser_lookup")
     )
     admin.add_view(UserAdmin(User, Session))
     admin.add_view(AliasAdmin(Alias, Session))

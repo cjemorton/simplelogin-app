@@ -216,7 +216,7 @@ def register_blueprints(app: Flask):
     app.register_blueprint(phone_bp)
 
     app.register_blueprint(oauth_bp, url_prefix="/oauth")
-    app.register_blueprint(oauth_bp, url_prefix="/oauth2")
+    app.register_blueprint(oauth_bp, url_prefix="/oauth2", name="oauth2")
     app.register_blueprint(onboarding_bp)
 
     app.register_blueprint(discover_bp)
