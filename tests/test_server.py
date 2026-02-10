@@ -12,7 +12,8 @@ def test_redirect_login_page(flask_client):
 
     rv = flask_client.get("/")
     assert rv.status_code == 302
-    assert rv.location == f"http://{EMAIL_DOMAIN}/auth/login"
+    # Flask 3.x returns relative URLs by default
+    assert rv.location == "/auth/login"
 
 
 def test_coinbase_webhook(flask_client):

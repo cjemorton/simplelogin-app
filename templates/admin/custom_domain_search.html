@@ -442,7 +442,7 @@
         <div class="col-lg-3 col-md-6 col-sm-12 mb-2 mb-lg-0">
           <small class="text-muted">User</small>
           <div>
-            <a href="{{ url_for('admin.email_search.index', query=user.email, search_type='email') }}">
+            <a href="{{ url_for('admin_email_search.index', query=user.email, search_type='email') }}">
               <strong>{{ user.email }}</strong>
             </a>
           </div>
@@ -807,7 +807,7 @@
                             <code>{{ alias.id }}</code>
                           </td>
                           <td>
-                            <a href="{{ url_for('admin.email_search.index', query=alias.email, search_type='alias') }}">{{ alias.email }}</a>
+                            <a href="{{ url_for('admin_email_search.index', query=alias.email, search_type='alias') }}">{{ alias.email }}</a>
                           </td>
                           <td>{{ badge_status(alias.enabled, 'Yes', 'No', 'success', 'danger') }}</td>
                           <td class="text-nowrap">{{ alias.created_at.strftime("%Y-%m-%d %H:%M") }}</td>
@@ -895,7 +895,7 @@
               <span aria-hidden="true">&times;</span>
             </button>
           </div>
-          <form action="{{ url_for('admin.custom_domain_search.delete_custom_domain') }}"
+          <form action="{{ url_for('admin_custom_domain_search.delete_custom_domain') }}"
                 method="POST"
                 id="deleteDomainForm{{ domain.id }}">
             <div class="modal-body">

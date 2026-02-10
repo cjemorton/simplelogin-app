@@ -90,8 +90,8 @@ def test_rate_limit_limits_by_user_id_ignoring_ip(flask_client):
     fix_rate_limit_after_request()
     assert res.status_code == HTTPStatus.TOO_MANY_REQUESTS
 
-    # Log out
-    flask_client.cookie_jar.clear()
+    # Log out - delete all cookies in Werkzeug 3.x
+    flask_client.delete_cookie(key="session", domain="sl.lan")
 
     # Log in with another user
     login(flask_client)
