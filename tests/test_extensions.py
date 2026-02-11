@@ -1,6 +1,8 @@
 from http import HTTPStatus
 from random import Random
 
+from flask import url_for
+
 from app import config
 from app.extensions import limiter
 from tests.conftest import app as test_app
@@ -90,8 +92,9 @@ def test_rate_limit_limits_by_user_id_ignoring_ip(flask_client):
     fix_rate_limit_after_request()
     assert res.status_code == HTTPStatus.TOO_MANY_REQUESTS
 
-    # Log out
-    flask_client.cookie_jar.clear()
+    # Log out properly by calling the logout endpoint
+    # This ensures Flask-Login and the session are properly cleared
+    flask_client.get(url_for("auth.logout"), follow_redirects=True)
 
     # Log in with another user
     login(flask_client)

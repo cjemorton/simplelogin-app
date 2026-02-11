@@ -121,9 +121,9 @@ def test_no_duplicate_notifications_with_authorized_address(flask_client):
     ]
 
     # Verify that emails were sent to all contacts
-    assert (
-        len(emails_to_contacts) == num_contacts
-    ), f"Expected {num_contacts} emails to contacts, got {len(emails_to_contacts)}"
+    assert len(emails_to_contacts) == num_contacts, (
+        f"Expected {num_contacts} emails to contacts, got {len(emails_to_contacts)}"
+    )
 
     # With the fix: only 1 notification should be sent to the second mailbox,
     # not one per reverse alias
@@ -296,9 +296,9 @@ def test_multiple_other_mailboxes_get_one_notification_each(flask_client):
     ]
 
     # Each non-sending mailbox should receive exactly one notification
-    assert (
-        len(notifications_to_second) == 1
-    ), f"Expected 1 notification to second mailbox, got {len(notifications_to_second)}"
-    assert (
-        len(notifications_to_third) == 1
-    ), f"Expected 1 notification to third mailbox, got {len(notifications_to_third)}"
+    assert len(notifications_to_second) == 1, (
+        f"Expected 1 notification to second mailbox, got {len(notifications_to_second)}"
+    )
+    assert len(notifications_to_third) == 1, (
+        f"Expected 1 notification to third mailbox, got {len(notifications_to_third)}"
+    )

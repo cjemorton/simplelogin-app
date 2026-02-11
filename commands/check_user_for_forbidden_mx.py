@@ -2,6 +2,7 @@
 """
 Checks if the user is using a forbidden MX or domain
 """
+
 import argparse
 from typing import Optional, Set
 

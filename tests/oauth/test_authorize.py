@@ -702,7 +702,8 @@ def test_authorize_page_invalid_client_id(flask_client):
     )
 
     assert r.status_code == 302
-    assert r.location == url_for("auth.login")
+    # Flask 3.x returns relative URLs in redirects
+    assert r.location == "/auth/login"
 
 
 def test_authorize_page_http_not_allowed(flask_client):
@@ -724,7 +725,8 @@ def test_authorize_page_http_not_allowed(flask_client):
     )
 
     assert r.status_code == 302
-    assert r.location == url_for("dashboard.index")
+    # Flask 3.x returns relative URLs in redirects
+    assert r.location == "/dashboard/"
 
 
 def test_authorize_page_unknown_redirect_uri(flask_client):
@@ -746,4 +748,5 @@ def test_authorize_page_unknown_redirect_uri(flask_client):
     )
 
     assert r.status_code == 302
-    assert r.location == url_for("dashboard.index")
+    # Flask 3.x returns relative URLs in redirects
+    assert r.location == "/dashboard/"
