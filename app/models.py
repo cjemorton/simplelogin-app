@@ -80,7 +80,8 @@ class ModelMixin(object):
 
     @classmethod
     def get(cls, id):
-        return Session.query(cls).get(id)
+        # SQLAlchemy 2.0: Use Session.get() instead of Session.query().get()
+        return Session.get(cls, id)
 
     @classmethod
     def get_by(cls, **kw):
@@ -137,6 +138,7 @@ class ModelMixin(object):
 
     @classmethod
     def delete(cls, obj_id, commit=False):
+        # SQLAlchemy 2.0: Keep using query API for delete operations
         Session.query(cls).filter(cls.id == obj_id).delete()
 
         if commit:
@@ -1836,12 +1838,12 @@ class Alias(Base, ModelMixin):
         agent.record_custom_event(
             "AliasCreated",
             {
-                "custom_domain": "custom domain"
-                if new_alias.custom_domain_id
-                else "base domain",
-                "from_partner": "from partner"
-                if new_alias.is_created_from_partner()
-                else "from sl",
+                "custom_domain": (
+                    "custom domain" if new_alias.custom_domain_id else "base domain"
+                ),
+                "from_partner": (
+                    "from partner" if new_alias.is_created_from_partner() else "from sl"
+                ),
                 "automatic": "automatic" if new_alias.automatic_creation else "manual",
             },
         )
@@ -3025,6 +3027,7 @@ class Mailbox(Base, ModelMixin):
                 alias._mailboxes.remove(first_mb)
             else:
                 from app.alias_delete import perform_alias_deletion, move_alias_to_trash
+
                 # If the user setting is DeleteImmediately, perform alias deletion
                 # Otherwise, if the user setting is MoveToTrash, assign the default mailbox and move them to trash
 
