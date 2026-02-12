@@ -32,12 +32,14 @@ app.config["SERVER_NAME"] = "sl.lan"
 # enable pg_trgm extension
 with engine.connect() as conn:
     try:
-        conn.execute("DROP EXTENSION if exists pg_trgm")
-        conn.execute("CREATE EXTENSION pg_trgm")
+        from sqlalchemy import text
+        conn.execute(text("DROP EXTENSION if exists pg_trgm"))
+        conn.execute(text("CREATE EXTENSION pg_trgm"))
+        conn.commit()
     except sqlalchemy.exc.InternalError as e:
         if isinstance(e.orig, errors.lookup(DEPENDENT_OBJECTS_STILL_EXIST)):
             print(">>> pg_trgm can't be dropped, ignore")
-        conn.execute("Rollback")
+        conn.rollback()
 
 add_sl_domains()
 add_proton_partner()
