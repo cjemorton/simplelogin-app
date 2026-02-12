@@ -222,7 +222,7 @@ The upgrade process is divided into three waves to minimize risk and ensure stab
      ```python
      # Before
      conn.execute("CREATE EXTENSION pg_trgm")
-     
+
      # After
      from sqlalchemy import text
      conn.execute(text("CREATE EXTENSION pg_trgm"))
@@ -271,7 +271,7 @@ This approach allows us to:
 **Future Modernization Path**:
 When ready to fully adopt SQLAlchemy 2.0 patterns:
 1. Replace `Session.query(Model)` with `Session.execute(select(Model))`
-2. Replace `.filter()` with `.where()`  
+2. Replace `.filter()` with `.where()`
 3. Replace `.first()`, `.all()` with result object methods (`.scalar()`, `.scalars().all()`)
 4. Consider migrating from `declarative_base()` to `DeclarativeBase` class
 5. Consider reorganizing models.py into a models/ package
