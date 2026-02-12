@@ -8,6 +8,7 @@ Create Date: 2021-08-04 09:28:26.620053
 import sqlalchemy_utils
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy import text
 
 
 # revision identifiers, used by Alembic.
@@ -25,10 +26,12 @@ def upgrade():
     bind = op.get_bind()
     session = Session(bind=bind)
 
-    session.execute("""
+    # SQLAlchemy 2.0: Use text() for raw SQL
+    session.execute(text("""
     ALTER TABLE alias ADD COLUMN ts_vector tsvector GENERATED ALWAYS
     AS (to_tsvector('english', note)) STORED;
-    """)
+    """))
+    session.commit()
 
     op.create_index('ix_video___ts_vector__', 'alias', ['ts_vector'], unique=False, postgresql_using='gin')
     # ### end Alembic commands ###

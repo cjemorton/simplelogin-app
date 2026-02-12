@@ -26,7 +26,8 @@ def upgrade():
     except sa.exc.ProgrammingError as e:
         if isinstance(e.orig, errors.lookup(DUPLICATE_OBJECT)):
             print(">>> pg_trgm already loaded, ignore")
-            op.execute("Rollback")
+            # SQLAlchemy 2.0: Use proper rollback instead of execute("Rollback")
+            op.get_bind().rollback()
 
     op.create_index('note_pg_trgm_index', 'alias', ['note'], unique=False, postgresql_ops={'note': 'gin_trgm_ops'}, postgresql_using='gin')
     # ### end Alembic commands ###
