@@ -80,7 +80,8 @@ class ModelMixin(object):
 
     @classmethod
     def get(cls, id):
-        return Session.query(cls).get(id)
+        # SQLAlchemy 2.0: Use Session.get() instead of Session.query().get()
+        return Session.get(cls, id)
 
     @classmethod
     def get_by(cls, **kw):
@@ -137,6 +138,7 @@ class ModelMixin(object):
 
     @classmethod
     def delete(cls, obj_id, commit=False):
+        # SQLAlchemy 2.0: Keep using query API for delete operations
         Session.query(cls).filter(cls.id == obj_id).delete()
 
         if commit:
