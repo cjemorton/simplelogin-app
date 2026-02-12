@@ -33,6 +33,7 @@ app.config["SERVER_NAME"] = "sl.lan"
 with engine.connect() as conn:
     try:
         from sqlalchemy import text
+
         conn.execute(text("DROP EXTENSION if exists pg_trgm"))
         conn.execute(text("CREATE EXTENSION pg_trgm"))
         conn.commit()

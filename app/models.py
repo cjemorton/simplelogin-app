@@ -1838,12 +1838,12 @@ class Alias(Base, ModelMixin):
         agent.record_custom_event(
             "AliasCreated",
             {
-                "custom_domain": "custom domain"
-                if new_alias.custom_domain_id
-                else "base domain",
-                "from_partner": "from partner"
-                if new_alias.is_created_from_partner()
-                else "from sl",
+                "custom_domain": (
+                    "custom domain" if new_alias.custom_domain_id else "base domain"
+                ),
+                "from_partner": (
+                    "from partner" if new_alias.is_created_from_partner() else "from sl"
+                ),
                 "automatic": "automatic" if new_alias.automatic_creation else "manual",
             },
         )
@@ -3027,6 +3027,7 @@ class Mailbox(Base, ModelMixin):
                 alias._mailboxes.remove(first_mb)
             else:
                 from app.alias_delete import perform_alias_deletion, move_alias_to_trash
+
                 # If the user setting is DeleteImmediately, perform alias deletion
                 # Otherwise, if the user setting is MoveToTrash, assign the default mailbox and move them to trash
 
