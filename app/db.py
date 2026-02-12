@@ -14,8 +14,11 @@ engine = create_engine(
 # This is the recommended pattern for 2.0
 Session = scoped_session(sessionmaker(bind=engine))
 
-# Keep connection for backward compatibility, but note:
-# In SQLAlchemy 2.0, it's better to use engine.connect() as a context manager
+# Module-level connection for backward compatibility with tests
+# TODO: This connection is created on import and never explicitly closed.
+# Future improvement: Migrate tests to use context-managed connections
+# (e.g., `with engine.connect() as conn:`) and remove this global.
+# For now, keeping for compatibility with tests/conftest.py
 connection = engine.connect()
 
 # Session is actually a proxy, more info on

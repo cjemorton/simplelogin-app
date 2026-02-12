@@ -6,10 +6,9 @@ Create Date: 2021-08-04 09:28:26.620053
 
 """
 
-import sqlalchemy_utils
 from alembic import op
-import sqlalchemy as sa
 from sqlalchemy import text
+from sqlalchemy.orm import sessionmaker
 
 
 # revision identifiers, used by Alembic.
@@ -17,8 +16,6 @@ revision = "9014cca7097c"
 down_revision = "ffa75d04e6ef"
 branch_labels = None
 depends_on = None
-
-from sqlalchemy.orm import sessionmaker
 
 Session = sessionmaker()
 
@@ -37,7 +34,7 @@ def upgrade():
     """
         )
     )
-    session.commit()
+    # Alembic manages transaction commits, no manual commit needed
 
     op.create_index(
         "ix_video___ts_vector__",
